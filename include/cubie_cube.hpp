@@ -30,5 +30,5 @@ public:
         }
     }
 
-    void multiply();
+    void multiply(const CubieCube &b);
 };
