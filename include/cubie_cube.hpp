@@ -1,3 +1,5 @@
+#pragma once
+
 #include <array>
 #include "corner.hpp"
 #include "edge.hpp"
@@ -30,5 +32,6 @@ public:
         }
     }
 
+    bool is_solved();
     void multiply(const CubieCube &b);
 };

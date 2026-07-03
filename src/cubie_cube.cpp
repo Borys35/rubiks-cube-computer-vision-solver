@@ -1,5 +1,20 @@
 #include "cubie_cube.hpp"
 
+bool CubieCube::is_solved()
+{
+    for (int i = 0; i < EDGE_COUNT; i++)
+    {
+        if (ep[i] != static_cast<Edge>(i) || eo[i] != 0)
+            return false;
+    }
+    for (int i = 0; i < CORNER_COUNT; i++)
+    {
+        if (cp[i] != static_cast<Corner>(i) || co[i] != 0)
+            return false;
+    }
+    return true;
+}
+
 void CubieCube::multiply(const CubieCube &b)
 {
     CubieCube result;
