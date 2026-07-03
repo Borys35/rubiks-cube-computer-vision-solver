@@ -3,6 +3,9 @@
 #include <array>
 #include "corner.hpp"
 #include "edge.hpp"
+#include "color.hpp"
+
+using FaceletCube = std::array<Color, 54>;
 
 class CubieCube
 {
@@ -32,6 +35,7 @@ public:
         }
     }
 
-    bool is_solved();
+    bool is_solved() const;
     void multiply(const CubieCube &b);
+    FaceletCube to_facelet_cube() const;
 };
