@@ -16,9 +16,9 @@ int main()
     std::vector<int> scramble_moves = {R, U_PRIME, F2, L};
     std::cout << "Scramble: " << moves_to_string(scramble_moves) << std::endl;
 
-    std::string scramble_string = "L' R U2";
+    std::string scramble_string = "L' R U2 R";
     scramble_moves = string_to_moves(scramble_string);
-    for (int i = 0; i < 3; i++)
+    for (size_t i = 0; i < scramble_moves.size(); i++)
     {
         cc.multiply(ALL_MOVES[scramble_moves[i]]);
     }
@@ -34,9 +34,10 @@ int main()
     visualizer->display_cube(cc.to_facelet_cube());
 
     ISolver *solver = new BFSSolver();
-    std::string solve = solver->solve(cc);
+    std::vector<int> solve_moves = solver->solve(cc);
 
-    std::cout << "Solve: " << solve << std::endl;
+    // should be "Solve: U2 L R'" or "Solve: U2 R' L"
+    std::cout << "Solve: " << moves_to_string(solve_moves) << std::endl;
 
     delete visualizer;
     delete solver;

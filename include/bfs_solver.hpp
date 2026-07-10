@@ -7,5 +7,5 @@ class BFSSolver : public ISolver
 public:
     BFSSolver() = default;
 
-    std::string solve(const CubieCube &cc) override;
+    std::vector<int> solve(const CubieCube &cc) override;
 };
