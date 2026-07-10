@@ -11,22 +11,22 @@ void TerminalVisualizer::display_cube(const FaceletCube &fc) const
         switch (c)
         {
         case U_COLOR:
-            std::cout << "\033[48;5;15m  \033[0m";
+            std::cout << "\033[48;5;231m  \033[0m";
             break;
         case D_COLOR:
-            std::cout << "\033[48;5;11m  \033[0m";
+            std::cout << "\033[48;5;220m  \033[0m";
             break;
         case F_COLOR:
-            std::cout << "\033[48;5;10m  \033[0m";
+            std::cout << "\033[48;5;34m  \033[0m";
             break;
         case B_COLOR:
-            std::cout << "\033[48;5;12m  \033[0m";
+            std::cout << "\033[48;5;33m  \033[0m";
             break;
         case L_COLOR:
             std::cout << "\033[48;5;208m  \033[0m";
             break;
         case R_COLOR:
-            std::cout << "\033[48;5;9m  \033[0m";
+            std::cout << "\033[48;5;196m  \033[0m";
             break;
         }
     };
