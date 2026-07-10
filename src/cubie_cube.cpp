@@ -78,18 +78,18 @@ FaceletCube CubieCube::to_facelet_cube() const
     }
 
     static const int edge_facelets[12][2] = {
-        {5, 10},  // UR slot: U, R facelets
-        {7, 19},  // UF slot: U, F facelets
-        {3, 37},  // UL slot: U, L facelets
-        {1, 46},  // UB slot: U, B facelets
-        {28, 14}, // DR slot: D, R facelets
-        {30, 23}, // DF slot: D, F facelets
-        {34, 41}, // DL slot: D, L facelets
-        {32, 52}, // DB slot: D, B facelets
-        {21, 12}, // FR slot: F, R facelets
-        {25, 43}, // FL slot: F, L facelets
-        {48, 39}, // BL slot: B, L facelets
-        {50, 16}  // BR slot: B, R facelets
+        {5, 10},  // UR slot: U6, R2
+        {7, 19},  // UF slot: U8, F2
+        {3, 37},  // UL slot: U4, L2
+        {1, 46},  // UB slot: U2, B2
+        {32, 16}, // DR slot: D6, R8
+        {28, 25}, // DF slot: D2, F8
+        {30, 43}, // DL slot: D4, L8
+        {34, 52}, // DB slot: D8, B8
+        {23, 12}, // FR slot: F6, R4
+        {21, 41}, // FL slot: F4, L6
+        {50, 39}, // BL slot: B6, L4
+        {48, 14}  // BR slot: B4, R6
     };
 
     static const Color edge_colors[12][2] = {

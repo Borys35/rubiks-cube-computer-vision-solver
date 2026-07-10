@@ -8,4 +8,6 @@ public:
     virtual ~Visualizer() = default;
 
     virtual void display_cube(const FaceletCube &fc) const = 0;
+
+    void show_facelet_indices(const FaceletCube &fc) const;
 };

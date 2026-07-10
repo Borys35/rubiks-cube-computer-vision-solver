@@ -11,24 +11,12 @@ void print_if_solved(const CubieCube &c)
 int main()
 {
     CubieCube cc = CubieCube();
-    FaceletCube fc = cc.to_facelet_cube();
 
-    for (int i = 0; i < fc.size(); i++)
-    {
-        std::cout << fc[i];
-    }
-
-    // std::cout << "Is my cube solved?" << std::endl;
-    // print_if_solved(cc);
-    // std::cout << "Doing L2 move" << std::endl;
-    cc.multiply(ALL_MOVES[U]);
-    // print_if_solved(cc);
-    // std::cout << "Doing L2 move again" << std::endl;
-    // cc.multiply(ALL_MOVES[L2]);
-    // print_if_solved(cc);
+    cc.multiply(ALL_MOVES[L]);
 
     Visualizer *visualizer = new TerminalVisualizer();
 
+    visualizer->show_facelet_indices(cc.to_facelet_cube());
     visualizer->display_cube(cc.to_facelet_cube());
 
     delete visualizer;
