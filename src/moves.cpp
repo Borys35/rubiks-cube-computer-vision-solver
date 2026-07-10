@@ -1,4 +1,7 @@
 #include "moves.hpp"
+#include <sstream>
+#include <unordered_map>
+
 CubieCube create_base_move(MoveIndex move_idx)
 {
     CubieCube c = CubieCube();
@@ -6,7 +9,6 @@ CubieCube create_base_move(MoveIndex move_idx)
     switch (move_idx)
     {
     case U:
-
         c.cp = {Corner::UBR, Corner::URF, Corner::UFL, Corner::ULB, Corner::DFR, Corner::DFL, Corner::DLB, Corner::DBR};
         c.co = {0, 0, 0, 0, 0, 0, 0, 0};
         c.ep = {Edge::UB, Edge::UR, Edge::UF, Edge::UL, Edge::DR, Edge::DF, Edge::DL, Edge::DB, Edge::FR, Edge::FL, Edge::BL, Edge::BR};
@@ -70,3 +72,50 @@ const std::array<CubieCube, MOVE_COUNT> ALL_MOVES = []()
     }
     return moves;
 }();
+
+static const std::string MOVE_NAMES[18] = {
+    "U", "U2", "U'",
+    "D", "D2", "D'",
+    "R", "R2", "R'",
+    "L", "L2", "L'",
+    "F", "F2", "F'",
+    "B", "B2", "B'"};
+
+std::string moves_to_string(const std::vector<int> &moves)
+{
+    std::string result;
+    for (size_t i = 0; i < moves.size(); ++i)
+    {
+        if (moves[i] >= 0 && moves[i] < 18)
+        {
+            result += MOVE_NAMES[moves[i]];
+            if (i != moves.size() - 1)
+            {
+                result += " ";
+            }
+        }
+    }
+    return result;
+}
+
+std::vector<int> string_to_moves(const std::string move_string)
+{
+    static const std::unordered_map<std::string, int> STRING_TO_MOVE = {
+        {"U", U}, {"U2", U2}, {"U'", U_PRIME}, {"D", D}, {"D2", D2}, {"D'", D_PRIME}, {"R", R}, {"R2", R2}, {"R'", R_PRIME}, {"L", L}, {"L2", L2}, {"L'", L_PRIME}, {"F", F}, {"F2", F2}, {"F'", F_PRIME}, {"B", B}, {"B2", B2}, {"B'", B_PRIME}};
+
+    std::vector<int> result;
+    std::istringstream iss(move_string);
+    std::string token;
+
+    // Automatically splits by spaces
+    while (iss >> token)
+    {
+        auto it = STRING_TO_MOVE.find(token);
+        if (it != STRING_TO_MOVE.end())
+        {
+            result.push_back(it->second);
+        }
+    }
+
+    return result;
+}

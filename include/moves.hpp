@@ -1,6 +1,8 @@
 #pragma once
 
 #include <array>
+#include <string>
+#include <vector>
 #include "cubie_cube.hpp"
 
 enum MoveIndex
@@ -28,3 +30,6 @@ enum MoveIndex
 constexpr int MOVE_COUNT = 18;
 
 extern const std::array<CubieCube, MOVE_COUNT> ALL_MOVES;
+
+std::string moves_to_string(const std::vector<int> &moves);
+std::vector<int> string_to_moves(const std::string move_string);
