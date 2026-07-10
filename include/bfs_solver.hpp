@@ -4,8 +4,11 @@
 
 class BFSSolver : public ISolver
 {
+private:
+    int max_depth;
+
 public:
-    BFSSolver() = default;
+    BFSSolver(int max_depth) : max_depth(max_depth) {}
 
     std::vector<int> solve(const CubieCube &cc) override;
 };

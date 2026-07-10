@@ -19,8 +19,7 @@ std::vector<int> BFSSolver::solve(const CubieCube &cc)
             return move_history;
         }
 
-        // depth = 6 for now
-        if (move_history.size() >= 6)
+        if (move_history.size() >= max_depth)
         {
             continue;
         }

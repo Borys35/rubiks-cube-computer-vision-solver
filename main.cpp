@@ -33,7 +33,8 @@ int main()
 
     visualizer->display_cube(cc.to_facelet_cube());
 
-    ISolver *solver = new BFSSolver();
+    auto max_depth{8u};
+    ISolver *solver = new BFSSolver(max_depth);
     std::vector<int> solve_moves = solver->solve(cc);
 
     // should be "Solve: U2 L R'" or "Solve: U2 R' L"
