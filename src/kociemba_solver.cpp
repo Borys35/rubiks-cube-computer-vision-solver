@@ -1,19 +1,5 @@
 #include "kociemba_solver.hpp"
 
-KociembaSolver::KociembaSolver(int max_depth) : max_depth(max_depth)
-{
-    p2_restricted_moves[0] = U;
-    p2_restricted_moves[1] = U2;
-    p2_restricted_moves[2] = U_PRIME;
-    p2_restricted_moves[3] = D;
-    p2_restricted_moves[4] = D2;
-    p2_restricted_moves[5] = D_PRIME;
-    p2_restricted_moves[6] = R2;
-    p2_restricted_moves[7] = L2;
-    p2_restricted_moves[8] = F2;
-    p2_restricted_moves[9] = B2;
-}
-
 std::vector<int> KociembaSolver::solve(const CubieCube &cc)
 {
     std::vector<int> p1_moves{};

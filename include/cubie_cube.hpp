@@ -37,5 +37,15 @@ public:
 
     bool is_solved() const;
     void multiply(const CubieCube &b);
+
+    // facelet cube representation
     FaceletCube to_facelet_cube() const;
+
+    // for coordinate cube representation
+    void set_eo_from_coordinate(int eo_coord);
+    void set_co_from_coordinate(int co_coord);
+    void set_ud_slice_from_coordinate(int ud_slice_coord);
+    int get_eo_coordinate() const;
+    int get_co_coordinate() const;
+    int get_ud_slice_coordinate() const;
 };

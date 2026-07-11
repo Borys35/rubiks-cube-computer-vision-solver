@@ -117,3 +117,69 @@ FaceletCube CubieCube::to_facelet_cube() const
 
     return fc;
 }
+
+void CubieCube::set_eo_from_coordinate(int eo_coord)
+{
+    for (int i = EDGE_COUNT - 1; i >= 0; --i)
+    {
+        eo[i] = eo_coord % 2;
+        eo_coord /= 2;
+    }
+}
+
+void CubieCube::set_co_from_coordinate(int co_coord)
+{
+    for (int i = CORNER_COUNT - 1; i >= 0; --i)
+    {
+        co[i] = co_coord % 3;
+        co_coord /= 3;
+    }
+}
+
+void CubieCube::set_ud_slice_from_coordinate(int ud_slice_coord)
+{
+    for (int i = 0; i < EDGE_COUNT; ++i)
+    {
+        if (ud_slice_coord & (1 << i))
+        {
+            ep[i] = static_cast<Edge>(8 + i); // Set to UD slice edges
+        }
+        else
+        {
+            ep[i] = static_cast<Edge>(i); // Set to non-UD slice edges
+        }
+    }
+}
+
+int CubieCube::get_eo_coordinate() const
+{
+    int eo_coord = 0;
+    for (int i = 0; i < EDGE_COUNT; ++i)
+    {
+        eo_coord = (eo_coord << 1) | eo[i];
+    }
+    return eo_coord;
+}
+
+int CubieCube::get_co_coordinate() const
+{
+    int co_coord = 0;
+    for (int i = 0; i < CORNER_COUNT; ++i)
+    {
+        co_coord = co_coord * 3 + co[i];
+    }
+    return co_coord;
+}
+
+int CubieCube::get_ud_slice_coordinate() const
+{
+    int ud_slice_coord = 0;
+    for (int i = 0; i < EDGE_COUNT; ++i)
+    {
+        if (static_cast<int>(ep[i]) >= 8) // check if the edge is in the UD slice
+        {
+            ud_slice_coord |= (1 << i);
+        }
+    }
+    return ud_slice_coord;
+}
