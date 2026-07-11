@@ -1,9 +1,23 @@
 #include "kociemba_solver.hpp"
 
+KociembaSolver::KociembaSolver(int max_depth) : max_depth(max_depth)
+{
+    p2_restricted_moves[0] = U;
+    p2_restricted_moves[1] = U2;
+    p2_restricted_moves[2] = U_PRIME;
+    p2_restricted_moves[3] = D;
+    p2_restricted_moves[4] = D2;
+    p2_restricted_moves[5] = D_PRIME;
+    p2_restricted_moves[6] = R2;
+    p2_restricted_moves[7] = L2;
+    p2_restricted_moves[8] = F2;
+    p2_restricted_moves[9] = B2;
+}
+
 std::vector<int> KociembaSolver::solve(const CubieCube &cc)
 {
     std::vector<int> p1_moves{};
-    // IDA*
+    // Phase 1 IDA*
     for (int depth1 = 0; depth1 < max_depth; depth1++)
     {
         search_phase1(cc, depth1, p1_moves);
@@ -46,6 +60,7 @@ void KociembaSolver::search_phase1(const CubieCube &state, int depth_left, std::
         int max_depth2 = max_depth - p1_moves.size() - 1;
 
         std::vector<int> p2_moves{};
+        // Phase 2 IDA*
         for (int depth2 = 0; depth2 <= max_depth2; depth2++)
         {
             search_phase2(state, depth2, p1_moves, p2_moves);
@@ -66,10 +81,36 @@ void KociembaSolver::search_phase1(const CubieCube &state, int depth_left, std::
 
         search_phase1(next_state, depth_left - 1, p1_moves);
 
-        p1_moves.pop_back();
+        p1_moves.pop_back(); // remove last move to backtrack
     }
 }
 
 void KociembaSolver::search_phase2(const CubieCube &state, int depth_left, std::vector<int> &p1_moves, std::vector<int> &p2_moves)
 {
+    // TODO: implement pruning
+
+    // goal reached
+    if (depth_left == 0 && state.is_solved())
+    {
+        best_solution.reserve(p1_moves.size() + p2_moves.size());
+        best_solution.insert(best_solution.end(), p1_moves.begin(), p1_moves.end());
+        best_solution.insert(best_solution.end(), p2_moves.begin(), p2_moves.end());
+
+        return;
+    }
+
+    // DFS for restricted moves only (R2, L2, F2, B2, all U's, all D's)
+    for (auto move : p2_restricted_moves)
+    {
+        if (!p2_moves.empty() && is_redundant_move(p2_moves.back(), static_cast<int>(move)))
+            continue;
+
+        CubieCube next_state = state;
+        next_state.multiply(ALL_MOVES[move]);
+        p2_moves.push_back(move);
+
+        search_phase2(next_state, depth_left - 1, p1_moves, p2_moves);
+
+        p2_moves.pop_back(); // remove last move to backtrack
+    }
 }
