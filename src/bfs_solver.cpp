@@ -26,7 +26,7 @@ std::vector<int> BFSSolver::solve(const CubieCube &cc)
         for (int m = 0; m < 18; ++m)
         {
             // pruning. Not allowing same moves (e.g. U -> U' -> U2)
-            if (!move_history.empty() && (move_history.back() / 3 == m / 3))
+            if (!move_history.empty() && (is_redundant_move(move_history.back(), m)))
             {
                 continue;
             }

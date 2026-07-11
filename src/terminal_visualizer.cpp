@@ -1,9 +1,6 @@
 #include <iostream>
 #include "terminal_visualizer.hpp"
 
-#include "terminal_visualizer.hpp"
-#include <iostream>
-
 void TerminalVisualizer::display_cube(const FaceletCube &fc) const
 {
     auto print_sticker = [](Color c)

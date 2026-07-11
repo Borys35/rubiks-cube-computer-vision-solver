@@ -119,3 +119,10 @@ std::vector<int> string_to_moves(const std::string move_string)
 
     return result;
 }
+
+bool is_redundant_move(int m1, int m2)
+{
+    if (m1 / 3 == m2 / 3)
+        return true;
+    return false;
+}

@@ -33,3 +33,4 @@ extern const std::array<CubieCube, MOVE_COUNT> ALL_MOVES;
 
 std::string moves_to_string(const std::vector<int> &moves);
 std::vector<int> string_to_moves(const std::string move_string);
+bool is_redundant_move(int m1, int m2);
