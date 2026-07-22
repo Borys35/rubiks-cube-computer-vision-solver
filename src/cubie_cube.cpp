@@ -151,6 +151,72 @@ void CubieCube::set_ud_slice_from_coordinate(int ud_slice_coord)
     }
 }
 
+void CubieCube::set_cp_from_coordinate(int cp_coord)
+{
+    Corner elements[8];
+    for (int i = 0; i < 8; ++i)
+        elements[i] = static_cast<Corner>(i);
+
+    int factorial = 5040; // 7!
+    for (int i = 0; i < 8; ++i)
+    {
+        int pos = cp_coord / factorial;
+        cp[i] = elements[pos];
+        cp_coord %= factorial;
+
+        for (int j = pos; j < 7 - i; ++j)
+        {
+            elements[j] = elements[j + 1];
+        }
+        if (i < 7)
+            factorial /= (7 - i);
+    }
+}
+
+void CubieCube::set_ep8_from_coordinate(int ep8_coord)
+{
+    Edge elements[8];
+    for (int i = 0; i < 8; ++i)
+        elements[i] = static_cast<Edge>(i);
+
+    int factorial = 5040; // 7!
+    for (int i = 0; i < 8; ++i)
+    {
+        int pos = ep8_coord / factorial;
+        ep[i] = elements[pos];
+        ep8_coord %= factorial;
+
+        for (int j = pos; j < 7 - i; ++j)
+        {
+            elements[j] = elements[j + 1];
+        }
+        if (i < 7)
+            factorial /= (7 - i);
+    }
+}
+
+void CubieCube::set_ud_slice_perm_from_coordinate(int ud_slice_perm_coord)
+{
+    Edge elements[4];
+    for (int i = 0; i < 4; ++i)
+        elements[i] = static_cast<Edge>(8 + i);
+
+    int factorial = 6; // 3!
+    for (int i = 0; i < 4; ++i)
+    {
+        int pos = ud_slice_perm_coord / factorial;
+        ep[8 + i] = elements[pos];
+        ud_slice_perm_coord %= factorial;
+
+        for (int j = pos; j < 3 - i; ++j)
+        {
+            elements[j] = elements[j + 1];
+        }
+        if (i < 3)
+            factorial /= (3 - i);
+    }
+}
+
 int CubieCube::get_eo_coordinate() const
 {
     int eo_coord = 0;
@@ -182,4 +248,58 @@ int CubieCube::get_ud_slice_coordinate() const
         }
     }
     return ud_slice_coord;
+}
+
+int CubieCube::get_cp_coordinate() const
+{
+    int index = 0;
+    int factorial = 5040; // 7!
+    for (int i = 0; i < 7; ++i)
+    {
+        int smaller = 0;
+        for (int j = i + 1; j < 8; ++j)
+        {
+            if (cp[j] < cp[i])
+                smaller++;
+        }
+        index += smaller * factorial;
+        factorial /= (7 - i);
+    }
+    return index;
+}
+
+int CubieCube::get_ep8_coordinate() const
+{
+    int index = 0;
+    int factorial = 5040; // 7!
+    for (int i = 0; i < 7; ++i)
+    {
+        int smaller = 0;
+        for (int j = i + 1; j < 8; ++j)
+        {
+            if (ep[j] < ep[i])
+                smaller++;
+        }
+        index += smaller * factorial;
+        factorial /= (7 - i);
+    }
+    return index;
+}
+
+int CubieCube::get_ud_slice_perm_coordinate() const
+{
+    int index = 0;
+    int factorial = 6; // 3!
+    for (int i = 0; i < 3; ++i)
+    {
+        int smaller = 0;
+        for (int j = i + 1; j < 4; ++j)
+        {
+            if (ep[8 + j] < ep[8 + i])
+                smaller++;
+        }
+        index += smaller * factorial;
+        factorial /= (3 - i);
+    }
+    return index;
 }
