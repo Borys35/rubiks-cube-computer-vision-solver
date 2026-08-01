@@ -15,14 +15,36 @@ void print_if_solved(const CubieCube &c)
 
 int main()
 {
-    cv::Mat img = cv::Mat::zeros(300, 300, CV_8UC3);
-    cv::putText(img, "WSL2 OpenCV", cv::Point(50, 150),
-                cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 255, 0), 2);
+    cv::VideoCapture cap(0, cv::CAP_V4L2);
+    if (!cap.isOpened())
+    {
+        std::cerr << "Error: Could not open the camera." << std::endl;
+        return -1;
+    }
 
-    cv::imwrite("test.jpg", img);
-    std::cout << "Image successfully saved!" << std::endl;
+    cap.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('M', 'J', 'P', 'G'));
 
-    return 0;
+    cap.set(cv::CAP_PROP_FRAME_WIDTH, 640);
+    cap.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
+
+    while (true)
+    {
+        cv::Mat frame;
+        cap >> frame;
+
+        if (frame.empty())
+        {
+            std::cerr << "Error: Could not capture a frame." << std::endl;
+            break;
+        }
+
+        cv::imshow("Camera Feed", frame);
+
+        if (cv::waitKey(30) == 'q')
+        {
+            break;
+        }
+    }
 }
 /*
 int main()
