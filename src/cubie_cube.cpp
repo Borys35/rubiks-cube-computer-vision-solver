@@ -118,6 +118,20 @@ FaceletCube CubieCube::to_facelet_cube() const
     return fc;
 }
 
+int CubieCube::cnk(int n, int k) const
+{
+    if (n < k || k < 0)
+        return 0;
+    if (k == 0)
+        return 1;
+    int val = 1;
+    for (int i = 0; i < k; ++i)
+    {
+        val = val * (n - i) / (i + 1);
+    }
+    return val;
+}
+
 void CubieCube::set_eo_from_coordinate(int eo_coord)
 {
     for (int i = EDGE_COUNT - 1; i >= 0; --i)
@@ -136,17 +150,29 @@ void CubieCube::set_co_from_coordinate(int co_coord)
     }
 }
 
-void CubieCube::set_ud_slice_from_coordinate(int ud_slice_coord)
+void CubieCube::set_ud_slice_from_coordinate(int coord)
 {
-    for (int i = 0; i < EDGE_COUNT; ++i)
+    int k = 3;
+    for (int i = 11; i >= 0; --i)
     {
-        if (ud_slice_coord & (1 << i))
+        if (coord >= cnk(i, k + 1))
         {
-            ep[i] = static_cast<Edge>(8 + i); // Set to UD slice edges
+            coord -= cnk(i, k + 1);
+            ep[i] = static_cast<Edge>(8 + k);
+            k--;
         }
         else
         {
-            ep[i] = static_cast<Edge>(i); // Set to non-UD slice edges
+            ep[i] = static_cast<Edge>(-1);
+        }
+    }
+
+    int non_ud = 0;
+    for (int i = 0; i < 12; ++i)
+    {
+        if (static_cast<int>(ep[i]) == -1)
+        {
+            ep[i] = static_cast<Edge>(non_ud++);
         }
     }
 }
@@ -239,15 +265,19 @@ int CubieCube::get_co_coordinate() const
 
 int CubieCube::get_ud_slice_coordinate() const
 {
-    int ud_slice_coord = 0;
-    for (int i = 0; i < EDGE_COUNT; ++i)
+    int coord = 0;
+    int k = 3;
+    for (int i = 11; i >= 0; --i)
     {
-        if (static_cast<int>(ep[i]) >= 8) // check if the edge is in the UD slice
+        if (static_cast<int>(ep[i]) >= 8)
         {
-            ud_slice_coord |= (1 << i);
+            coord += cnk(i, k + 1);
+            k--;
+            if (k < 0)
+                break;
         }
     }
-    return ud_slice_coord;
+    return coord;
 }
 
 int CubieCube::get_cp_coordinate() const

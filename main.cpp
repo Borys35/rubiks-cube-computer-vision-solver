@@ -20,11 +20,6 @@ int main()
     std::string scramble_string = "L' R U2 R";
     std::cout << "Scramble: " << scramble_string << std::endl;
 
-    // for (size_t i = 0; i < 18; i++)
-    // {
-    //     cc.multiply(ALL_MOVES[i]);
-    // }
-
     std::vector<int> scramble_moves = string_to_moves(scramble_string);
     for (size_t i = 0; i < scramble_moves.size(); i++)
     {

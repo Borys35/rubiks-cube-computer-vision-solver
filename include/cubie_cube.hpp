@@ -54,4 +54,7 @@ public:
     int get_cp_coordinate() const;
     int get_ep8_coordinate() const;
     int get_ud_slice_perm_coordinate() const;
+
+private:
+    int cnk(int n, int k) const; // combinatorial number system n choose k
 };
