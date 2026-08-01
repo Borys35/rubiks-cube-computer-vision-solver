@@ -6,12 +6,25 @@
 #include "bfs_solver.hpp"
 #include "kociemba_solver.hpp"
 #include "pruning_tables.hpp"
+#include <opencv2/opencv.hpp>
 
 void print_if_solved(const CubieCube &c)
 {
     std::cout << (c.is_solved() ? "> It's solved!" : "> Not solved yet...") << std::endl;
 }
 
+int main()
+{
+    cv::Mat img = cv::Mat::zeros(300, 300, CV_8UC3);
+    cv::putText(img, "WSL2 OpenCV", cv::Point(50, 150),
+                cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 255, 0), 2);
+
+    cv::imwrite("test.jpg", img);
+    std::cout << "Image successfully saved!" << std::endl;
+
+    return 0;
+}
+/*
 int main()
 {
     MoveTables::init_move_tables();
@@ -45,3 +58,4 @@ int main()
 
     return 0;
 }
+*/

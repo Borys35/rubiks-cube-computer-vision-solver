@@ -8,10 +8,16 @@
                 "-fdiagnostics-color=always",
                 "-g",
                 "-Iinclude",
+                "-I/usr/include/opencv4",
                 "${workspaceFolder}/main.cpp",
                 "${workspaceFolder}/src/*.cpp",
                 "-o",
-                "${workspaceFolder}/build/main"
+                "${workspaceFolder}/build/main",
+                "-lopencv_core",
+                "-lopencv_imgproc",
+                "-lopencv_highgui",
+                "-lopencv_imgcodecs",
+                "-lopencv_videoio"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
