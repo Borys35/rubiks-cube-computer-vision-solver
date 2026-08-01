@@ -134,20 +134,28 @@ int CubieCube::cnk(int n, int k) const
 
 void CubieCube::set_eo_from_coordinate(int eo_coord)
 {
-    for (int i = EDGE_COUNT - 1; i >= 0; --i)
+    int eo_sum = 0;
+    for (int i = EDGE_COUNT - 2; i >= 0; --i)
     {
         eo[i] = eo_coord % 2;
+        eo_sum += eo[i];
         eo_coord /= 2;
     }
+
+    eo[EDGE_COUNT - 1] = (2 - (eo_sum % 2)) % 2;
 }
 
 void CubieCube::set_co_from_coordinate(int co_coord)
 {
-    for (int i = CORNER_COUNT - 1; i >= 0; --i)
+    int co_sum = 0;
+    for (int i = CORNER_COUNT - 2; i >= 0; --i)
     {
         co[i] = co_coord % 3;
+        co_sum += co[i];
         co_coord /= 3;
     }
+
+    co[CORNER_COUNT - 1] = (3 - (co_sum % 3)) % 3;
 }
 
 void CubieCube::set_ud_slice_from_coordinate(int coord)
@@ -246,7 +254,7 @@ void CubieCube::set_ud_slice_perm_from_coordinate(int ud_slice_perm_coord)
 int CubieCube::get_eo_coordinate() const
 {
     int eo_coord = 0;
-    for (int i = 0; i < EDGE_COUNT; ++i)
+    for (int i = 0; i < EDGE_COUNT - 1; ++i) // EDGE_COUNT - 1 because the last edge's orientation is determined by the others
     {
         eo_coord = (eo_coord << 1) | eo[i];
     }
@@ -256,7 +264,7 @@ int CubieCube::get_eo_coordinate() const
 int CubieCube::get_co_coordinate() const
 {
     int co_coord = 0;
-    for (int i = 0; i < CORNER_COUNT; ++i)
+    for (int i = 0; i < CORNER_COUNT - 1; ++i)
     {
         co_coord = co_coord * 3 + co[i];
     }

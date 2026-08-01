@@ -10,7 +10,8 @@ namespace Kociemba
     class KociembaSolver : public ISolver
     {
     private:
-        int max_depth{25}; // max moves allowed
+        int max_depth_total{25}; // max moves allowed
+        int max_depth1{15};      // max moves allowed for a solution to be considered acceptable
         std::vector<int> best_solution;
 
         bool is_cube_in_g1_substate(const CubieCube &cc);
@@ -18,7 +19,7 @@ namespace Kociemba
         void search_phase2(const CubieCube &state, int depth_left, std::vector<int> &p1_moves, std::vector<int> &p2_moves);
 
     public:
-        KociembaSolver(int max_depth) : max_depth(max_depth)
+        KociembaSolver(int max_depth_total, int max_depth1) : max_depth_total(max_depth_total), max_depth1(max_depth1)
         {
         }
 

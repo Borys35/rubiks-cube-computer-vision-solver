@@ -1,24 +1,32 @@
 #include "pruning_tables.hpp"
 #include "moves.hpp"
+#include <iostream>
 
 namespace Kociemba
 {
     namespace PruningTables
     {
-        std::vector<int> PRUNING_CO_UD(CO_COUNT *UD_SLICE_COUNT, -1);
-        std::vector<int> PRUNING_EO_UD(EO_COUNT *UD_SLICE_COUNT, -1);
-        std::vector<int> PRUNING_CP_SLICE(CP_COUNT *UD_SLICE_PERM_COUNT, -1);
-        std::vector<int> PRUNING_EP8_SLICE(EP8_COUNT *UD_SLICE_PERM_COUNT, -1);
+        std::vector<int8_t> PRUNING_CO_UD(CO_COUNT *UD_SLICE_COUNT, -1);
+        std::vector<int8_t> PRUNING_EO_UD(EO_COUNT *UD_SLICE_COUNT, -1);
+        std::vector<int8_t> PRUNING_CP_SLICE(CP_COUNT *UD_SLICE_PERM_COUNT, -1);
+        std::vector<int8_t> PRUNING_EP8_SLICE(EP8_COUNT *UD_SLICE_PERM_COUNT, -1);
 
         void generate_co_ud_pruning_table()
         {
-            PRUNING_CO_UD[0 * UD_SLICE_COUNT + 0] = 0;
-            int depth = 0;
-            int populated_count = 1;
-            const int total_states = CO_COUNT * UD_SLICE_COUNT;
+            CubieCube solved_cube{};
+            int solved_co = solved_cube.get_co_coordinate();
+            int solved_ud = solved_cube.get_ud_slice_coordinate();
 
-            while (populated_count < total_states)
+            std::cout << "Generating CO-UD pruning table... Solved co: " << solved_co << " solved_ud: " << solved_ud << std::endl;
+
+            PRUNING_CO_UD[solved_co * UD_SLICE_COUNT + solved_ud] = 0;
+
+            int depth = 0;
+            int a = 1;
+
+            while (a > 0)
             {
+                a = 0;
                 for (int co = 0; co < CO_COUNT; co++)
                 {
                     for (int ud = 0; ud < UD_SLICE_COUNT; ud++)
@@ -35,7 +43,7 @@ namespace Kociemba
                                 if (PRUNING_CO_UD[next_idx] == -1)
                                 {
                                     PRUNING_CO_UD[next_idx] = depth + 1;
-                                    populated_count++;
+                                    a++;
                                 }
                             }
                         }
@@ -47,13 +55,17 @@ namespace Kociemba
 
         void generate_eo_ud_pruning_table()
         {
-            PRUNING_EO_UD[0 * UD_SLICE_COUNT + 0] = 0;
-            int depth = 0;
-            int populated_count = 1;
-            const int total_states = EO_COUNT * UD_SLICE_COUNT;
+            CubieCube solved_cube{};
+            int solved_eo = solved_cube.get_eo_coordinate();
+            int solved_ud = solved_cube.get_ud_slice_coordinate();
 
-            while (populated_count < total_states)
+            PRUNING_EO_UD[solved_eo * UD_SLICE_COUNT + solved_ud] = 0;
+            int depth = 0;
+            int a = 1;
+
+            while (a > 0)
             {
+                a = 0;
                 for (int eo = 0; eo < EO_COUNT; eo++)
                 {
                     for (int ud = 0; ud < UD_SLICE_COUNT; ud++)
@@ -70,7 +82,7 @@ namespace Kociemba
                                 if (PRUNING_EO_UD[next_idx] == -1)
                                 {
                                     PRUNING_EO_UD[next_idx] = depth + 1;
-                                    populated_count++;
+                                    a++;
                                 }
                             }
                         }
@@ -84,11 +96,11 @@ namespace Kociemba
         {
             PRUNING_CP_SLICE[0 * UD_SLICE_PERM_COUNT + 0] = 0;
             int depth = 0;
-            int populated_count = 1;
-            const int total_states = CP_COUNT * UD_SLICE_PERM_COUNT;
+            int a = 1;
 
-            while (populated_count < total_states)
+            while (a > 0)
             {
+                a = 0;
                 for (int cp = 0; cp < CP_COUNT; cp++)
                 {
                     for (int slice = 0; slice < UD_SLICE_PERM_COUNT; slice++)
@@ -106,7 +118,7 @@ namespace Kociemba
                                 if (PRUNING_CP_SLICE[next_idx] == -1)
                                 {
                                     PRUNING_CP_SLICE[next_idx] = depth + 1;
-                                    populated_count++;
+                                    a++;
                                 }
                             }
                         }
@@ -120,11 +132,11 @@ namespace Kociemba
         {
             PRUNING_EP8_SLICE[0 * UD_SLICE_PERM_COUNT + 0] = 0;
             int depth = 0;
-            int populated_count = 1;
-            const int total_states = EP8_COUNT * UD_SLICE_PERM_COUNT;
+            int a = 1;
 
-            while (populated_count < total_states)
+            while (a > 0)
             {
+                a = 0;
                 for (int ep8 = 0; ep8 < EP8_COUNT; ep8++)
                 {
                     for (int slice = 0; slice < UD_SLICE_PERM_COUNT; slice++)
@@ -142,7 +154,7 @@ namespace Kociemba
                                 if (PRUNING_EP8_SLICE[next_idx] == -1)
                                 {
                                     PRUNING_EP8_SLICE[next_idx] = depth + 1;
-                                    populated_count++;
+                                    a++;
                                 }
                             }
                         }

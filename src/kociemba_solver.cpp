@@ -1,14 +1,18 @@
 #include "kociemba_solver.hpp"
+#include "pruning_tables.hpp"
 #include <iostream>
 
 namespace Kociemba
 {
+    int max_depth = 0;
+
     std::vector<int> KociembaSolver::solve(const CubieCube &cc)
     {
         best_solution.clear();
+        max_depth = max_depth_total;
         std::vector<int> p1_moves{};
         // Phase 1 IDA*
-        for (int depth1 = 0; depth1 < max_depth; depth1++)
+        for (int depth1 = 0; depth1 <= max_depth1; depth1++)
         {
             std::cout << "Searching phase 1 with depth " << depth1 << std::endl;
             search_phase1(cc, depth1, p1_moves);
@@ -43,13 +47,22 @@ namespace Kociemba
 
     void KociembaSolver::search_phase1(const CubieCube &state, int depth_left, std::vector<int> &p1_moves)
     {
-        // TODO: pruning
+        // pruning
+        int co = state.get_co_coordinate();
+        int eo = state.get_eo_coordinate();
+        int ud = state.get_ud_slice_coordinate();
+
+        int heuristic = PruningTables::get_phase1_pruning_value(co, eo, ud);
+
+        if (heuristic > depth_left)
+        {
+            return; // not enough depth left to reach goal
+        }
 
         // goal reached
-
-        if (is_cube_in_g1_substate(state))
+        if (heuristic == 0)
         {
-            int max_depth2 = max_depth - p1_moves.size() - 1;
+            int max_depth2 = max_depth - p1_moves.size();
 
             std::vector<int> p2_moves{};
             // Phase 2 IDA*
@@ -84,11 +97,20 @@ namespace Kociemba
 
     void KociembaSolver::search_phase2(const CubieCube &state, int depth_left, std::vector<int> &p1_moves, std::vector<int> &p2_moves)
     {
-        // TODO: implement pruning
+        // pruning
+        int cp = state.get_cp_coordinate();
+        int ep8 = state.get_ep8_coordinate();
+        int slice = state.get_ud_slice_perm_coordinate();
+
+        int heuristic = PruningTables::get_phase2_pruning_value(cp, ep8, slice);
+
+        if (heuristic > depth_left)
+        {
+            return; // not enough depth left to reach goal
+        }
 
         // goal reached
-
-        if (state.is_solved())
+        if (heuristic == 0)
         {
             if (best_solution.empty() || p1_moves.size() + p2_moves.size() < best_solution.size())
             {
@@ -97,6 +119,9 @@ namespace Kociemba
                 best_solution.reserve(p1_moves.size() + p2_moves.size());
                 best_solution.insert(best_solution.end(), p1_moves.begin(), p1_moves.end());
                 best_solution.insert(best_solution.end(), p2_moves.begin(), p2_moves.end());
+
+                // shrink down total depth
+                max_depth = best_solution.size() - 1;
             }
             return;
         }
