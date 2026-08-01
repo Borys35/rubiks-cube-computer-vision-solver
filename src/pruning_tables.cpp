@@ -1,9 +1,9 @@
-#include "pruning.hpp"
+#include "pruning_tables.hpp"
 #include "moves.hpp"
 
 namespace Kociemba
 {
-    namespace Pruning
+    namespace PruningTables
     {
         std::vector<int> PRUNING_CO_UD(CO_COUNT *UD_SLICE_COUNT, -1);
         std::vector<int> PRUNING_EO_UD(EO_COUNT *UD_SLICE_COUNT, -1);
@@ -28,8 +28,8 @@ namespace Kociemba
                         {
                             for (int move = 0; move < 18; move++)
                             {
-                                int next_co = CoordinateCube::MOVE_TABLE_CO[co][move];
-                                int next_ud = CoordinateCube::MOVE_TABLE_UD_SLICE[ud][move];
+                                int next_co = MoveTables::MOVE_TABLE_CO[co][move];
+                                int next_ud = MoveTables::MOVE_TABLE_UD_SLICE[ud][move];
                                 int next_idx = next_co * UD_SLICE_COUNT + next_ud;
 
                                 if (PRUNING_CO_UD[next_idx] == -1)
@@ -63,8 +63,8 @@ namespace Kociemba
                         {
                             for (int move = 0; move < 18; move++)
                             {
-                                int next_eo = CoordinateCube::MOVE_TABLE_EO[eo][move];
-                                int next_ud = CoordinateCube::MOVE_TABLE_UD_SLICE[ud][move];
+                                int next_eo = MoveTables::MOVE_TABLE_EO[eo][move];
+                                int next_ud = MoveTables::MOVE_TABLE_UD_SLICE[ud][move];
                                 int next_idx = next_eo * UD_SLICE_COUNT + next_ud;
 
                                 if (PRUNING_EO_UD[next_idx] == -1)
@@ -99,8 +99,8 @@ namespace Kociemba
                             for (int i = 0; i < 10; i++)
                             {
                                 int move = Kociemba::PHASE_2_MOVES[i];
-                                int next_cp = CoordinateCube::MOVE_TABLE_CP[cp][move];
-                                int next_slice = CoordinateCube::MOVE_TABLE_UD_SLICE_PERM[slice][move];
+                                int next_cp = MoveTables::MOVE_TABLE_CP[cp][move];
+                                int next_slice = MoveTables::MOVE_TABLE_UD_SLICE_PERM[slice][move];
                                 int next_idx = next_cp * UD_SLICE_PERM_COUNT + next_slice;
 
                                 if (PRUNING_CP_SLICE[next_idx] == -1)
@@ -135,8 +135,8 @@ namespace Kociemba
                             for (int i = 0; i < 10; i++)
                             {
                                 int move = Kociemba::PHASE_2_MOVES[i];
-                                int next_ep8 = CoordinateCube::MOVE_TABLE_EP8[ep8][move];
-                                int next_slice = CoordinateCube::MOVE_TABLE_UD_SLICE_PERM[slice][move];
+                                int next_ep8 = MoveTables::MOVE_TABLE_EP8[ep8][move];
+                                int next_slice = MoveTables::MOVE_TABLE_UD_SLICE_PERM[slice][move];
                                 int next_idx = next_ep8 * UD_SLICE_PERM_COUNT + next_slice;
 
                                 if (PRUNING_EP8_SLICE[next_idx] == -1)

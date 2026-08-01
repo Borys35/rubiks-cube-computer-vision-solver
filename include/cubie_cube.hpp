@@ -45,7 +45,13 @@ public:
     void set_eo_from_coordinate(int eo_coord);
     void set_co_from_coordinate(int co_coord);
     void set_ud_slice_from_coordinate(int ud_slice_coord);
+    void set_cp_from_coordinate(int cp_coord);
+    void set_ep8_from_coordinate(int ep8_coord);
+    void set_ud_slice_perm_from_coordinate(int ud_slice_perm_coord);
     int get_eo_coordinate() const;
     int get_co_coordinate() const;
     int get_ud_slice_coordinate() const;
+    int get_cp_coordinate() const;
+    int get_ep8_coordinate() const;
+    int get_ud_slice_perm_coordinate() const;
 };

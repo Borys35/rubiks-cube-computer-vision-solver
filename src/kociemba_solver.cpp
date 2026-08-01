@@ -44,26 +44,27 @@ namespace Kociemba
         // TODO: pruning
 
         // goal reached
+
+        if (is_cube_in_g1_substate(state))
+        {
+            int max_depth2 = max_depth - p1_moves.size() - 1;
+
+            std::vector<int> p2_moves{};
+            // Phase 2 IDA*
+            for (int depth2 = 0; depth2 <= max_depth2; depth2++)
+            {
+                search_phase2(state, depth2, p1_moves, p2_moves);
+            }
+
+            return;
+        }
+
         if (depth_left <= 0)
         {
-            if (is_cube_in_g1_substate(state))
-            {
-                int max_depth2 = max_depth - p1_moves.size() - 1;
-
-                std::vector<int> p2_moves{};
-                // Phase 2 IDA*
-                for (int depth2 = 0; depth2 <= max_depth2; depth2++)
-                {
-                    search_phase2(state, depth2, p1_moves, p2_moves);
-                }
-
-                return;
-            }
             return; // not in g state
         }
 
         // DFS
-        // move = 9, 11 make the segmentation fault, rest is fine
         for (int move = 0; move < MOVE_COUNT; move++)
         {
             if (!p1_moves.empty() && is_redundant_move(p1_moves.back(), move))
@@ -84,18 +85,19 @@ namespace Kociemba
         // TODO: implement pruning
 
         // goal reached
-        // goal reached or depth limit hit
+
+        if (state.is_solved())
+        {
+            std::cout << "Found solution with " << p1_moves.size() + p2_moves.size() << " moves." << std::endl;
+            best_solution.reserve(p1_moves.size() + p2_moves.size());
+            best_solution.insert(best_solution.end(), p1_moves.begin(), p1_moves.end());
+            best_solution.insert(best_solution.end(), p2_moves.begin(), p2_moves.end());
+            return;
+        }
+
         if (depth_left <= 0)
         {
-            if (state.is_solved())
-            {
-                std::cout << "Found solution with " << p1_moves.size() + p2_moves.size() << " moves." << std::endl;
-                best_solution.clear();
-                best_solution.reserve(p1_moves.size() + p2_moves.size());
-                best_solution.insert(best_solution.end(), p1_moves.begin(), p1_moves.end());
-                best_solution.insert(best_solution.end(), p2_moves.begin(), p2_moves.end());
-            }
-            return; // ALWAYS return to stop recursion
+            return;
         }
 
         // DFS for restricted moves only (R2, L2, F2, B2, all U's, all D's)

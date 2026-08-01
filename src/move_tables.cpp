@@ -1,14 +1,14 @@
-#include "coordinate_cube.hpp"
+#include "move_tables.hpp"
 #include "kociemba_solver.hpp"
 
-int CoordinateCube::MOVE_TABLE_EO[EO_COORDINATE_COUNT][MOVE_COUNT];
-int CoordinateCube::MOVE_TABLE_CO[CO_COORDINATE_COUNT][MOVE_COUNT];
-int CoordinateCube::MOVE_TABLE_UD_SLICE[UD_SLICE_COORDINATE_COUNT][MOVE_COUNT];
-int CoordinateCube::MOVE_TABLE_CP[CP_COORDINATE_COUNT][MOVE_COUNT];
-int CoordinateCube::MOVE_TABLE_EP8[EP8_COORDINATE_COUNT][MOVE_COUNT];
-int CoordinateCube::MOVE_TABLE_UD_SLICE_PERM[UD_SLICE_PERM_COORDINATE_COUNT][MOVE_COUNT];
+int MoveTables::MOVE_TABLE_EO[EO_COORDINATE_COUNT][MOVE_COUNT];
+int MoveTables::MOVE_TABLE_CO[CO_COORDINATE_COUNT][MOVE_COUNT];
+int MoveTables::MOVE_TABLE_UD_SLICE[UD_SLICE_COORDINATE_COUNT][MOVE_COUNT];
+int MoveTables::MOVE_TABLE_CP[CP_COORDINATE_COUNT][MOVE_COUNT];
+int MoveTables::MOVE_TABLE_EP8[EP8_COORDINATE_COUNT][MOVE_COUNT];
+int MoveTables::MOVE_TABLE_UD_SLICE_PERM[UD_SLICE_PERM_COORDINATE_COUNT][MOVE_COUNT];
 
-void CoordinateCube::init_move_tables()
+void MoveTables::init_move_tables()
 {
     init_eo_move_tables();
     init_co_move_tables();
@@ -18,7 +18,7 @@ void CoordinateCube::init_move_tables()
     init_ud_slice_perm_move_tables();
 }
 
-void CoordinateCube::init_eo_move_tables()
+void MoveTables::init_eo_move_tables()
 {
     CubieCube cc;
     for (int i = 0; i < EO_COORDINATE_COUNT; i++)
@@ -34,7 +34,7 @@ void CoordinateCube::init_eo_move_tables()
     }
 }
 
-void CoordinateCube::init_co_move_tables()
+void MoveTables::init_co_move_tables()
 {
     CubieCube cc;
     for (int i = 0; i < CO_COORDINATE_COUNT; i++)
@@ -50,7 +50,7 @@ void CoordinateCube::init_co_move_tables()
     }
 }
 
-void CoordinateCube::init_ud_slice_move_tables()
+void MoveTables::init_ud_slice_move_tables()
 {
     CubieCube cc;
     for (int i = 0; i < UD_SLICE_COORDINATE_COUNT; i++)
@@ -66,7 +66,7 @@ void CoordinateCube::init_ud_slice_move_tables()
     }
 }
 
-void CoordinateCube::init_cp_move_tables()
+void MoveTables::init_cp_move_tables()
 {
     CubieCube cc;
     for (int i = 0; i < CP_COORDINATE_COUNT; i++)
@@ -82,7 +82,7 @@ void CoordinateCube::init_cp_move_tables()
     }
 }
 
-void CoordinateCube::init_ep8_move_tables()
+void MoveTables::init_ep8_move_tables()
 {
     CubieCube cc;
     for (int i = 0; i < EP8_COORDINATE_COUNT; i++)
@@ -98,7 +98,7 @@ void CoordinateCube::init_ep8_move_tables()
     }
 }
 
-void CoordinateCube::init_ud_slice_perm_move_tables()
+void MoveTables::init_ud_slice_perm_move_tables()
 {
     CubieCube cc;
     for (int i = 0; i < UD_SLICE_PERM_COORDINATE_COUNT; i++)
