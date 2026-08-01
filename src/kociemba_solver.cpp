@@ -5,10 +5,12 @@ namespace Kociemba
 {
     std::vector<int> KociembaSolver::solve(const CubieCube &cc)
     {
+        best_solution.clear();
         std::vector<int> p1_moves{};
         // Phase 1 IDA*
         for (int depth1 = 0; depth1 < max_depth; depth1++)
         {
+            std::cout << "Searching phase 1 with depth " << depth1 << std::endl;
             search_phase1(cc, depth1, p1_moves);
         }
         return best_solution;
@@ -88,10 +90,14 @@ namespace Kociemba
 
         if (state.is_solved())
         {
-            std::cout << "Found solution with " << p1_moves.size() + p2_moves.size() << " moves." << std::endl;
-            best_solution.reserve(p1_moves.size() + p2_moves.size());
-            best_solution.insert(best_solution.end(), p1_moves.begin(), p1_moves.end());
-            best_solution.insert(best_solution.end(), p2_moves.begin(), p2_moves.end());
+            if (best_solution.empty() || p1_moves.size() + p2_moves.size() < best_solution.size())
+            {
+                std::cout << "Found new solution with " << p1_moves.size() + p2_moves.size() << " moves." << std::endl;
+                best_solution.clear();
+                best_solution.reserve(p1_moves.size() + p2_moves.size());
+                best_solution.insert(best_solution.end(), p1_moves.begin(), p1_moves.end());
+                best_solution.insert(best_solution.end(), p2_moves.begin(), p2_moves.end());
+            }
             return;
         }
 

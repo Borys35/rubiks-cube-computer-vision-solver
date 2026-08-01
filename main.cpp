@@ -36,7 +36,7 @@ int main()
 
     auto max_depth{8u};
     // ISolver *solver = new BFSSolver(max_depth);
-    ISolver *solver = new Kociemba::KociembaSolver(8);
+    ISolver *solver = new Kociemba::KociembaSolver(6);
     std::vector<int> solve_moves = solver->solve(cc);
 
     // Solve: R' U2 R' L
