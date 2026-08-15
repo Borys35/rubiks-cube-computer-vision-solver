@@ -6,6 +6,7 @@
 #include "include/bfs_solver.hpp"
 #include "include/kociemba_solver.hpp"
 #include "include/pruning_tables.hpp"
+#include "CubeVision.h"
 #include <opencv2/opencv.hpp>
 #include <vector>
 #include <algorithm>
@@ -30,69 +31,10 @@ int main()
             break;
         }
 
-        cv::Mat yuv;
-        cv::cvtColor(frame, yuv, cv::COLOR_BGR2YUV);
-        cv::Mat yuv_norm = yuv.clone();
-
-        for (int r = 0; r < yuv.rows; r++)
-        {
-            for (int c = 0; c < yuv.cols; c++)
-            {
-                cv::Vec3b pixel = yuv.at<cv::Vec3b>(r, c);
-                uchar Y = pixel[0];
-                uchar U = pixel[1];
-                uchar V = pixel[2];
-
-                if (Y == 0 || Y == 255)
-                    continue;
-
-                float kappa = 1.0f;
-                if (Y > 128)
-                {
-                    kappa = 128.0f / Y;
-                }
-                else if (Y < 128)
-                {
-                    kappa = 128.0f / (256.0f - Y);
-                }
-
-                uchar U_prime = cv::saturate_cast<uchar>(std::round((U - 128.0f) * kappa + 128.0f));
-                uchar V_prime = cv::saturate_cast<uchar>(std::round((V - 128.0f) * kappa + 128.0f));
-
-                /*
-                
-                U_prime = std::clamp(U_prime, 0, 255);
-                V_prime = std::clamp(V_prime, 0, 255);
-                */
-
-                // Preserve original Y for Table 1 filtering, apply normalized U' and V'
-                yuv_norm.at<cv::Vec3b>(r, c) = cv::Vec3b(Y, U_prime, V_prime);
-            }
-        }
-
-        // Define masks for all 6 Rubik's Cube colors based on Table 1
-        cv::Mat mask_red, mask_orange, mask_blue, mask_green, mask_white, mask_yellow;
-
-        // Red: Y[50-140], U'[110±38 -> 72-148], V'[205±45 -> 160-250]
-        cv::inRange(yuv_norm, cv::Scalar(50, 72, 160), cv::Scalar(140, 148, 250), mask_red);
-
-        // Orange: Y[140-210], U'[100±48 -> 52-148], V'[205±45 -> 160-250]
-        cv::inRange(yuv_norm, cv::Scalar(140, 52, 160), cv::Scalar(210, 148, 250), mask_orange);
-
-        // Blue: Y[70-240], U'[195±55 -> 140-250], V'[55±55 -> 0-110]
-        cv::inRange(yuv_norm, cv::Scalar(70, 140, 0), cv::Scalar(240, 250, 110), mask_blue);
-
-        // Green: Y[70-240], U'[70±65 -> 5-135], V'[60±50 -> 10-110]
-        cv::inRange(yuv_norm, cv::Scalar(70, 5, 10), cv::Scalar(240, 135, 110), mask_green);
-
-        // White: Y[190-255], U'[128±12 -> 116-140], V'[128±11 -> 117-139]
-        cv::inRange(yuv_norm, cv::Scalar(190, 116, 117), cv::Scalar(255, 140, 139), mask_white);
-
-        // Yellow: Y[118-150], U'[90±25 -> 65-115], V'[140±20 -> 120-160]
-        cv::inRange(yuv_norm, cv::Scalar(118, 65, 120), cv::Scalar(150, 115, 160), mask_yellow);
+		cv::Mat yuv_norm = CubeVision::yuvNormalize(frame);
 
         // Combine all color masks into a single mask for cell detection
-        cv::Mat combined_mask = mask_red | mask_orange | mask_blue | mask_green | mask_white | mask_yellow;
+		cv::Mat combined_mask = CubeVision::makeCombinedColorMask(yuv_norm);
 
         // Cell Recognition: post-processed by subsequent erosion- and dilatation-like filtering
         cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(9, 9));

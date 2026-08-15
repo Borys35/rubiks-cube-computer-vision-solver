@@ -143,6 +143,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CubeVision.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="src\bfs_solver.cpp" />
     <ClCompile Include="src\cubie_cube.cpp" />
@@ -154,10 +155,10 @@
     <ClCompile Include="src\visualizer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CubeVision.h" />
     <ClInclude Include="include\bfs_solver.hpp" />
     <ClInclude Include="include\color.hpp" />
     <ClInclude Include="include\corner.hpp" />
-    <ClInclude Include="include\cube_vision.hpp" />
     <ClInclude Include="include\cubie_cube.hpp" />
     <ClInclude Include="include\edge.hpp" />
     <ClInclude Include="include\i_solver.hpp" />
