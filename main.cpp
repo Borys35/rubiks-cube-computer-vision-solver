@@ -1,17 +1,18 @@
 #include <iostream>
-#include "cubie_cube.hpp"
-#include "move_tables.hpp"
-#include "moves.hpp"
-#include "terminal_visualizer.hpp"
-#include "bfs_solver.hpp"
-#include "kociemba_solver.hpp"
-#include "pruning_tables.hpp"
+#include "include/cubie_cube.hpp"
+#include "include/move_tables.hpp"
+#include "include/moves.hpp"
+#include "include/terminal_visualizer.hpp"
+#include "include/bfs_solver.hpp"
+#include "include/kociemba_solver.hpp"
+#include "include/pruning_tables.hpp"
 #include <opencv2/opencv.hpp>
 #include <vector>
+#include <algorithm>
 
 int main()
 {
-    cv::VideoCapture cap("http://localhost:8080/video");
+    cv::VideoCapture cap(0);
     if (!cap.isOpened())
     {
         std::cerr << "Error: Could not open the camera." << std::endl;
@@ -38,9 +39,9 @@ int main()
             for (int c = 0; c < yuv.cols; c++)
             {
                 cv::Vec3b pixel = yuv.at<cv::Vec3b>(r, c);
-                float Y = pixel[0];
-                float U = pixel[1];
-                float V = pixel[2];
+                uchar Y = pixel[0];
+                uchar U = pixel[1];
+                uchar V = pixel[2];
 
                 if (Y == 0 || Y == 255)
                     continue;
@@ -55,11 +56,14 @@ int main()
                     kappa = 128.0f / (256.0f - Y);
                 }
 
-                int U_prime = std::round((U - 128) * kappa + 128);
-                int V_prime = std::round((V - 128) * kappa + 128);
+                uchar U_prime = cv::saturate_cast<uchar>(std::round((U - 128.0f) * kappa + 128.0f));
+                uchar V_prime = cv::saturate_cast<uchar>(std::round((V - 128.0f) * kappa + 128.0f));
 
+                /*
+                
                 U_prime = std::clamp(U_prime, 0, 255);
                 V_prime = std::clamp(V_prime, 0, 255);
+                */
 
                 // Preserve original Y for Table 1 filtering, apply normalized U' and V'
                 yuv_norm.at<cv::Vec3b>(r, c) = cv::Vec3b(Y, U_prime, V_prime);
@@ -159,7 +163,7 @@ int main()
             // Display the extracted and subdivided face in a new window
             cv::imshow("Extracted Cube Face", cube_face);
         }
-        // cv::imshow("Combined Color Mask", combined_mask);
+         cv::imshow("Combined Color Mask", combined_mask);
 
         if (cv::waitKey(30) == 'q')
         {

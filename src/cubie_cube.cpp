@@ -1,4 +1,4 @@
-#include "cubie_cube.hpp"
+#include "include/cubie_cube.hpp"
 
 bool CubieCube::is_solved() const
 {

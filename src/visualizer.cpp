@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "visualizer.hpp"
+#include "include/visualizer.hpp"
 
 void Visualizer::show_facelet_indices(const FaceletCube &fc) const
 {

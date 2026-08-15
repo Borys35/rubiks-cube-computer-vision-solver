@@ -1,5 +1,5 @@
-#include "move_tables.hpp"
-#include "kociemba_solver.hpp"
+#include "include/move_tables.hpp"
+#include "include/kociemba_solver.hpp"
 
 int MoveTables::MOVE_TABLE_EO[EO_COORDINATE_COUNT][MOVE_COUNT];
 int MoveTables::MOVE_TABLE_CO[CO_COORDINATE_COUNT][MOVE_COUNT];

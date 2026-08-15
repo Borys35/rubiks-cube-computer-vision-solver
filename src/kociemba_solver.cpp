@@ -1,5 +1,5 @@
-#include "kociemba_solver.hpp"
-#include "pruning_tables.hpp"
+#include "include/kociemba_solver.hpp"
+#include "include/pruning_tables.hpp"
 #include <iostream>
 
 namespace Kociemba

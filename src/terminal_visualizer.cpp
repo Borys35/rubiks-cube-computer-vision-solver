@@ -1,5 +1,5 @@
 #include <iostream>
-#include "terminal_visualizer.hpp"
+#include "include/terminal_visualizer.hpp"
 
 void TerminalVisualizer::display_cube(const FaceletCube &fc) const
 {

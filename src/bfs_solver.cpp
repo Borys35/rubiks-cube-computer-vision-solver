@@ -1,6 +1,6 @@
 #include <queue>
 
-#include "bfs_solver.hpp"
+#include "include/bfs_solver.hpp"
 
 std::vector<int> BFSSolver::solve(const CubieCube &cc)
 {
@@ -10,7 +10,9 @@ std::vector<int> BFSSolver::solve(const CubieCube &cc)
 
     while (!q.empty())
     {
-        auto [current_cube, move_history] = q.front();
+        std::pair<CubieCube, std::vector<int>> current_state = q.front();
+        CubieCube current_cube = current_state.first;
+        std::vector<int> move_history = current_state.second;
         q.pop();
 
         if (current_cube.is_solved())

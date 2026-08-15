@@ -1,5 +1,5 @@
-#include "pruning_tables.hpp"
-#include "moves.hpp"
+#include "include/pruning_tables.hpp"
+#include "include/moves.hpp"
 #include <iostream>
 
 namespace Kociemba
