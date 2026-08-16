@@ -105,7 +105,7 @@ int main()
             // Display the extracted and subdivided face in a new window
             cv::imshow("Extracted Cube Face", cube_face);
         }
-         cv::imshow("Combined Color Mask", combined_mask);
+        cv::imshow("Combined Color Mask", combined_mask);
 
         if (cv::waitKey(30) == 'q')
         {
