@@ -20,6 +20,36 @@ int main()
         return -1;
     }
 
+	CubeVision::ColorRange color_ranges[COLOR_COUNT] = {
+		{{148, 255}, {135, 156}, {31, 255}}, // U_COLOR (white)
+		{{78, 255}, {0, 255}, {167, 255}}, // R_COLOR (red)
+		{{13, 255}, {120, 177}, {10, 86}}, // F_COLOR (green)
+		{{0, 255}, {0, 112}, {107, 133}}, // D_COLOR (yellow)
+		{{0, 117}, {140, 250}, {0, 110}}, // L_COLOR (blue)
+		{{140, 210}, {52, 148}, {160, 250}}  // B_COLOR (orange)
+	};
+	CubeVision::HexColor display_colors[COLOR_COUNT] = {
+		{255, 255, 255}, // U_COLOR (white)
+		{0, 0, 255},     // R_COLOR (red)
+		{0, 255, 0},     // F_COLOR (green)
+		{0, 255, 255},   // D_COLOR (yellow)
+		{255, 0, 0},     // L_COLOR (blue)
+		{255, 165, 0}    // B_COLOR (orange)
+	};
+    CubeVision::Config my_cfg = {
+        .color_ranges = {
+            color_ranges[0], color_ranges[1], color_ranges[2], color_ranges[3], color_ranges[4], color_ranges[5]
+        },
+        .display_colors = {
+            display_colors[0], display_colors[1], display_colors[2], display_colors[3], display_colors[4], display_colors[5]
+        },
+        .stable_frame_count = 5,
+        .iou_threshold = 0.8f,
+        .min_solidity = 0.9f,
+    };
+
+	CubeVision cubeVision(my_cfg);
+
     while (true)
     {
         cv::Mat frame;
@@ -31,81 +61,10 @@ int main()
             break;
         }
 
-		cv::Mat yuv_norm = CubeVision::yuvNormalize(frame);
 
-        // Combine all color masks into a single mask for cell detection
-		cv::Mat combined_mask = CubeVision::makeCombinedColorMask(yuv_norm);
+        cv::Mat yuv = cubeVision.normalizeYuv(frame);
 
-        // Cell Recognition: post-processed by subsequent erosion- and dilatation-like filtering
-        cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(9, 9));
-        cv::erode(combined_mask, combined_mask, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3)), cv::Point(-1, -1), 2);
-        cv::dilate(combined_mask, combined_mask, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(15, 15)), cv::Point(-1, -1), 2);
-
-        // Border tracking of homogeneous regions
-        std::vector<std::vector<cv::Point>> contours;
-        cv::findContours(combined_mask, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
-
-        double max_area = 0.0;
-        int max_area_idx = -1;
-
-        // Find the contour with the largest area
-        for (size_t i = 0; i < contours.size(); i++)
-        {
-            double area = cv::contourArea(contours[i]);
-            if (area > max_area)
-            {
-                max_area = area;
-                max_area_idx = static_cast<int>(i);
-            }
-        }
-
-        cv::Mat frame_with_box = frame.clone();
-
-        // If a valid contour was found, draw a bounding rectangle around it
-        if (max_area_idx != -1)
-        {
-            cv::Rect bounding_box = cv::boundingRect(contours[max_area_idx]);
-
-            // Draw a green square/rectangle around the largest area
-            cv::rectangle(frame_with_box, bounding_box, cv::Scalar(0, 255, 0), 2);
-        }
-
-        cv::imshow("Camera Feed (Cube Detection)", frame_with_box);
-
-        if (max_area_idx != -1)
-        {
-            cv::Rect bounding_box = cv::boundingRect(contours[max_area_idx]);
-
-            // Draw a green rectangle around the largest area on the main frame
-            cv::rectangle(frame_with_box, bounding_box, cv::Scalar(0, 255, 0), 2);
-
-            // 1. Extract the cube face ROI from the original frame
-            cv::Mat cube_face = frame(bounding_box).clone();
-
-            // 2. Calculate individual cell dimensions
-            int cell_width = cube_face.cols / 3;
-            int cell_height = cube_face.rows / 3;
-
-            // 3. Draw the 3x3 grid
-            for (int row = 0; row < 3; row++)
-            {
-                for (int col = 0; col < 3; col++)
-                {
-                    // Define the bounding box for each of the 9 cells
-                    cv::Rect cell_rect(col * cell_width, row * cell_height, cell_width, cell_height);
-
-                    // Draw a blue grid line on the extracted face
-                    cv::rectangle(cube_face, cell_rect, cv::Scalar(255, 0, 0), 2);
-
-                    // (Optional) Extract the individual cell to analyze its average color
-                    // cv::Mat single_cell = cube_face(cell_rect);
-                }
-            }
-
-            // Display the extracted and subdivided face in a new window
-            cv::imshow("Extracted Cube Face", cube_face);
-        }
-        cv::imshow("Combined Color Mask", combined_mask);
+		cv::imshow("Camera Feed", yuv);
 
         if (cv::waitKey(30) == 'q')
         {

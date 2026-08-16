@@ -1,16 +1,57 @@
 #pragma once
 #include <opencv2/opencv.hpp>
+#include "include/color.hpp"
 
 class CubeVision
 {
 public:
-	struct Config {};
+	typedef struct {
+		uint8_t min;
+		uint8_t max;
+	} Range;
+
+	typedef struct {
+		Range y_range;
+		Range u_range;
+		Range v_range;
+	} ColorRange;
+
+	typedef struct {
+		uint8_t r;
+		uint8_t g;
+		uint8_t b;
+	} HexColor;
+
+	typedef struct {
+		int x;
+		int y;
+		int w;
+		int h;
+	} BoundingBox;
+
+	struct Config {
+		std::array<ColorRange, COLOR_COUNT> color_ranges;
+		std::array<HexColor, COLOR_COUNT> display_colors;
+		uint stable_frame_count = 5;
+		float iou_threshold = 0.7f;
+		float min_area_ratio = 0.1f;
+		uint min_colors = 1;
+		float min_solidity = 0.8f;
+		float min_rectangularity = 0.7f;
+		float min_cell_ratio = 0.3f;
+	};
+
 	CubeVision(const Config& config) : cfg(config) {}
 
-	cv::Mat yuvNormalize(const cv::Mat& bgr_frame);
-	cv::Mat makeCombinedColorMask(const cv::Mat& yuv_norm);
-
+	cv::Mat normalizeYuv(const cv::Mat& bgr_frame); // Returns YUV frame with normalized U and V channels
+	std::array<cv::Mat, COLOR_COUNT> detectCellColors(const cv::Mat& yuv_frame, cv::Mat& combined_mask); // Returns a color-coded frame. Can be converted to a combined mask
+	BoundingBox extractCubeFace(const cv::Mat& frame, const cv::Rect& bounding_box); // Returns BoundingBox of the detected cube face
+	void registerFrame(const cv::Mat& frame, const BoundingBox& detected_box); // Registers a frame and its detected bounding box for stability checking
 private:
 	Config cfg;
+
+	uint stable_frames;
+
+	float iou(const BoundingBox& box1, const BoundingBox& box2);
 };
 

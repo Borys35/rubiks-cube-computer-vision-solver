@@ -9,3 +9,5 @@ enum Color
     L_COLOR,
     B_COLOR
 };
+
+constexpr int COLOR_COUNT = 6;
