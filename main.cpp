@@ -28,13 +28,13 @@ int main()
 		{{0, 117}, {140, 250}, {0, 110}}, // L_COLOR (blue)
 		{{140, 210}, {52, 148}, {160, 250}}  // B_COLOR (orange)
 	};
-	CubeVision::HexColor display_colors[COLOR_COUNT] = {
+	CubeVision::BgrColor display_colors[COLOR_COUNT] = {
 		{255, 255, 255}, // U_COLOR (white)
-		{0, 0, 255},     // R_COLOR (red)
+		{255, 0, 0},     // R_COLOR (red)
 		{0, 255, 0},     // F_COLOR (green)
-		{0, 255, 255},   // D_COLOR (yellow)
-		{255, 0, 0},     // L_COLOR (blue)
-		{255, 165, 0}    // B_COLOR (orange)
+		{255, 255, 0},   // D_COLOR (yellow)
+		{0, 0, 255},     // L_COLOR (blue)
+		{0, 165, 255}    // B_COLOR (orange)
 	};
     CubeVision::Config my_cfg = {
         .color_ranges = {
@@ -63,8 +63,15 @@ int main()
 
 
         cv::Mat yuv = cubeVision.normalizeYuv(frame);
+		cv::Mat combined_mask = cv::Mat::zeros(yuv.size(), CV_8UC1);
+		std::array<cv::Mat, COLOR_COUNT> masks = cubeVision.detectCellColors(yuv, combined_mask);
+        cv::Mat output = cv::Mat::zeros(yuv.size(), CV_8UC3);;
+		for (int i = 0; i < COLOR_COUNT; ++i)
+		{
+		    cv:add(masks[i], output, output);
+		}
 
-		cv::imshow("Camera Feed", yuv);
+		cv::imshow("Camera Feed", output);
 
         if (cv::waitKey(30) == 'q')
         {

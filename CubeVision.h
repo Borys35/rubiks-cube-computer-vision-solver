@@ -17,10 +17,10 @@ public:
 	} ColorRange;
 
 	typedef struct {
-		uint8_t r;
-		uint8_t g;
 		uint8_t b;
-	} HexColor;
+		uint8_t g;
+		uint8_t r;
+	} BgrColor;
 
 	typedef struct {
 		int x;
@@ -31,7 +31,7 @@ public:
 
 	struct Config {
 		std::array<ColorRange, COLOR_COUNT> color_ranges;
-		std::array<HexColor, COLOR_COUNT> display_colors;
+		std::array<BgrColor, COLOR_COUNT> display_colors;
 		uint stable_frame_count = 5;
 		float iou_threshold = 0.7f;
 		float min_area_ratio = 0.1f;

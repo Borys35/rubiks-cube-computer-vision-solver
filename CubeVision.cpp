@@ -40,6 +40,8 @@ cv::Mat CubeVision::normalizeYuv(const cv::Mat& bgr_frame)
 
 std::array<cv::Mat, COLOR_COUNT> CubeVision::detectCellColors(const cv::Mat& yuv_frame, cv::Mat& combined_mask)
 {
+	cv::Mat erode_kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3));
+	cv::Mat dilate_kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(9, 9));
 	std::array<cv::Mat, COLOR_COUNT> masks;
 	for (int i = 0; i < COLOR_COUNT; ++i)
 	{
@@ -48,13 +50,15 @@ std::array<cv::Mat, COLOR_COUNT> CubeVision::detectCellColors(const cv::Mat& yuv
 			cv::Scalar(range.y_range.min, range.u_range.min, range.v_range.min),
 			cv::Scalar(range.y_range.max, range.u_range.max, range.v_range.max),
 			masks[i]);
-		cv::Mat erode_kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3));
-		cv::Mat dilate_kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(9, 9));
+		
 		cv::erode(masks[i], masks[i], erode_kernel);
 		cv::dilate(masks[i], masks[i], dilate_kernel);
-
+		
 		combined_mask |= masks[i];
-		masks[i].setTo(cv::Scalar(cfg.display_colors[i].b, cfg.display_colors[i].g, cfg.display_colors[i].r), masks[i]);
+
+		cv::Mat colored_mask = cv::Mat::zeros(masks[i].size(), CV_8UC3);
+		colored_mask.setTo(cv::Scalar(cfg.display_colors[i].b, cfg.display_colors[i].g, cfg.display_colors[i].r), masks[i]);
+		masks[i] = colored_mask;
 	}
 	
 	return masks;
