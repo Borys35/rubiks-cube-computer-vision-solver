@@ -38,6 +38,7 @@ public:
 		float min_solidity = 0.8f;
 		float min_rectangularity = 0.7f;
 		float min_cell_ratio = 0.3f;
+		float max_angle = 5.0f;
 	};
 
 	CubeVision(const Config& config) : cfg(config) {}

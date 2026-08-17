@@ -110,7 +110,6 @@ std::optional<cv::Rect> CubeVision::extractCubeFaceRect(const cv::Mat& combined_
 	std::vector<std::vector<cv::Point>> region_contours;
 	cv::findContours(cube_region, region_contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 	if (region_contours.empty()) {
-		std::cout << "region_contours.empty()" << std::endl;
 		return std::nullopt;
 	}
 
@@ -124,15 +123,19 @@ std::optional<cv::Rect> CubeVision::extractCubeFaceRect(const cv::Mat& combined_
 	double hull_area = cv::contourArea(hull);
 
 	if (hull_area > 0.0 && (region_area / hull_area) < cfg.min_solidity) {
-		std::cout << "no solidity" << std::endl;
 		return std::nullopt;
 	}
 
-	cv::Rect rect = cv::minAreaRect(region_contour).boundingRect();
+	cv::RotatedRect rotated_rect = cv::minAreaRect(region_contour);
+	if (rotated_rect.angle < (90.0f - cfg.max_angle / 2.0f) && rotated_rect.angle > (cfg.max_angle / 2.0f)) 
+	{
+		return std::nullopt;
+	}
+
+	cv::Rect rect = rotated_rect.boundingRect();
 	float aspect_ratio = static_cast<float>(rect.width) / static_cast<float>(rect.height);
 	if (aspect_ratio <= 0.85 || aspect_ratio >= 1.15) {
 
-		std::cout << "bad aspect ratio: " << aspect_ratio << std::endl;
 		return std::nullopt;
 	}
 

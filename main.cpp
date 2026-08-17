@@ -46,6 +46,7 @@ int main()
         .stable_frame_count = 5,
         .iou_threshold = 0.8f,
         .min_solidity = 0.9f,
+        .max_angle = 10.0f
     };
 
 	CubeVision cubeVision(my_cfg);
@@ -67,16 +68,15 @@ int main()
 		std::array<cv::Mat, COLOR_COUNT> masks = cubeVision.detectCellColors(yuv, combined_mask);
         std::optional<cv::Rect> my_rect = cubeVision.extractCubeFaceRect(combined_mask, masks);
 
-        if (my_rect.has_value()) {
-            std::cout << "Rect found" << std::endl;
-        }
-
         cv::Mat output = cv::Mat::zeros(yuv.size(), CV_8UC3);;
 		for (int i = 0; i < COLOR_COUNT; ++i)
 		{
 		    cv::add(masks[i], output, output);
 		}
 
+        if (my_rect.has_value()) {
+            cv::rectangle(output, my_rect.value(), cv::Scalar(200, 200, 200));
+        }
 		cv::imshow("Camera Feed", output);
 
         if (cv::waitKey(30) == 'q')
