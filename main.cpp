@@ -77,9 +77,12 @@ int main()
         if (my_rect.has_value()) {
             cv::rectangle(output, my_rect.value(), cv::Scalar(200, 200, 200));
         }
-		cv::imshow("Camera Feed", output);
 
-        if (cv::waitKey(30) == 'q')
+        cv::Mat combined_image;
+        cv::hconcat(frame, output, combined_image);
+		cv::imshow("Camera | Output", combined_image);
+
+        if (cv::waitKey(1) == 'q')
         {
             break;
         }

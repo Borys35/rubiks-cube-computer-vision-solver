@@ -51,7 +51,8 @@ private:
 	Config cfg;
 
 	uint stable_frames;
+	cv::Rect prev_rect;
 
-	float iou(const BoundingBox& box1, const BoundingBox& box2);
+	float iou(const cv::Rect& rect1, const cv::Rect& rect2);
 };
 
