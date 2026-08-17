@@ -157,6 +157,27 @@ float CubeVision::iou(const cv::Rect& rect1, const cv::Rect& rect2) {
 		return static_cast<float>(inter) / static_cast<float>(uni);
 }
 
+void CubeVision::registerRect(const std::optional<cv::Rect>& rect) {
+	if (rect.has_value()) {
+		if (prev_rect.has_value() && iou(prev_rect.value(), rect.value()) >= cfg.iou_threshold) {
+			stable_frames++;
+		}
+		else {
+			stable_frames = 0;
+		}
+		prev_rect = rect.value();
+
+		if (stable_frames >= cfg.stable_frame_count) {
+			std::cout << "Stable cube face detected" << std::endl;
+			stable_frames = 0;
+		}
+	}
+	else {
+		stable_frames = 0;
+		prev_rect = std::nullopt;
+	}
+}
+
 //cv::Mat CubeVision::makeCombinedColorMask(const cv::Mat& yuv_norm)
 //{
 //	cv::Mat mask_red, mask_orange, mask_blue, mask_green, mask_white, mask_yellow;

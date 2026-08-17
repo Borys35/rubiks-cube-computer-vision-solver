@@ -22,13 +22,6 @@ public:
 		uint8_t r;
 	} BgrColor;
 
-	typedef struct {
-		int x;
-		int y;
-		int w;
-		int h;
-	} BoundingBox;
-
 	struct Config {
 		std::array<ColorRange, COLOR_COUNT> color_ranges;
 		std::array<BgrColor, COLOR_COUNT> display_colors;
@@ -46,12 +39,12 @@ public:
 	cv::Mat normalizeYuv(const cv::Mat& bgr_frame); // Returns YUV frame with normalized U and V channels
 	std::array<cv::Mat, COLOR_COUNT> detectCellColors(const cv::Mat& yuv_frame, cv::Mat& combined_mask); // Returns a color-coded frame. Can be converted to a combined mask
 	std::optional<cv::Rect> extractCubeFaceRect(const cv::Mat& combined_mask, std::array<cv::Mat, COLOR_COUNT> masks); // Returns BoundingBox of the detected cube face
-	void registerFrame(const cv::Mat& frame, const BoundingBox& detected_box); // Registers a frame and its detected bounding box for stability checking
+	void registerRect(const std::optional<cv::Rect>& rect); // Registers a rect
 private:
 	Config cfg;
 
 	uint stable_frames;
-	cv::Rect prev_rect;
+	std::optional<cv::Rect> prev_rect;
 
 	float iou(const cv::Rect& rect1, const cv::Rect& rect2);
 };

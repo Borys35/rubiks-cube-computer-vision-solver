@@ -78,6 +78,8 @@ int main()
             cv::rectangle(output, my_rect.value(), cv::Scalar(200, 200, 200));
         }
 
+		cubeVision.registerRect(my_rect);
+
         cv::Mat combined_image;
         cv::hconcat(frame, output, combined_image);
 		cv::imshow("Camera | Output", combined_image);
