@@ -35,7 +35,6 @@ public:
 		uint stable_frame_count = 5;
 		float iou_threshold = 0.7f;
 		float min_area_ratio = 0.1f;
-		uint min_colors = 1;
 		float min_solidity = 0.8f;
 		float min_rectangularity = 0.7f;
 		float min_cell_ratio = 0.3f;
@@ -45,7 +44,7 @@ public:
 
 	cv::Mat normalizeYuv(const cv::Mat& bgr_frame); // Returns YUV frame with normalized U and V channels
 	std::array<cv::Mat, COLOR_COUNT> detectCellColors(const cv::Mat& yuv_frame, cv::Mat& combined_mask); // Returns a color-coded frame. Can be converted to a combined mask
-	BoundingBox extractCubeFace(const cv::Mat& frame, const cv::Rect& bounding_box); // Returns BoundingBox of the detected cube face
+	std::optional<cv::Rect> extractCubeFaceRect(const cv::Mat& combined_mask, const cv::Mat& frame, std::array<cv::Mat, COLOR_COUNT> masks); // Returns BoundingBox of the detected cube face
 	void registerFrame(const cv::Mat& frame, const BoundingBox& detected_box); // Registers a frame and its detected bounding box for stability checking
 private:
 	Config cfg;

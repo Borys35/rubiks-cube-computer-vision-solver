@@ -64,6 +64,71 @@ std::array<cv::Mat, COLOR_COUNT> CubeVision::detectCellColors(const cv::Mat& yuv
 	return masks;
 }
 
+std::optional<cv::Rect> CubeVision::extractCubeFaceRect(const cv::Mat& combined_mask, const cv::Mat& frame, std::array<cv::Mat, COLOR_COUNT> masks)
+{
+	// cv::findContours(combined_mask)
+	std::vector<std::vector<cv::Point>> contours;
+	cv::findContours(combined_mask, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+
+	if (contours.empty())
+	{
+		return std::nullopt;
+	}
+
+	auto largest = std::ranges::max_element(contours, {}, [](const auto& c) {
+		return cv::contourArea(c);
+	});
+
+	if (cv::contourArea(*largest) < cfg.min_area_ratio * combined_mask.total()) {
+		return std::nullopt;
+	}
+
+	cv::Mat cube_region = cv::Mat::zeros(combined_mask.size(), combined_mask.type());
+	int largest_idx = std::distance(contours.begin(), largest);
+
+	cv::drawContours(cube_region, contours, largest_idx, cv::Scalar(255), cv::FILLED);
+
+	// white handling
+	cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(7, 7));
+
+	cv::Mat dilated_region;
+	cv::dilate(cube_region, dilated_region, kernel, cv::Point(-1, -1), 1);
+
+	cv::Mat touching;
+	cv::bitwise_and(masks[U_COLOR], dilated_region, touching);
+	
+	cube_region.setTo(cv::Scalar(255), touching);
+
+	// shape check
+	int region_area = cv::countNonZero(cube_region);
+	std::vector<std::vector<cv::Point>> region_contours;
+	cv::findContours(cube_region, region_contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+	if (region_contours.empty()) {
+		return std::nullopt;
+	}
+
+	std::vector<cv::Point> region_contour = *std::ranges::max_element(region_contours, {}, [](const auto& c) {
+		return cv::contourArea(c);
+	});
+
+	// check if face is square (solidity)
+	std::vector<cv::Point> hull;
+	cv::convexHull(region_contour, hull);
+	double hull_area = cv::contourArea(hull);
+
+	if (hull_area > 0.0 && (region_area / hull_area) < cfg.min_solidity) {
+		return std::nullopt;
+	}
+
+	cv::Rect rect = cv::minAreaRect(region_contour).boundingRect();
+	float aspect_ratio = static_cast<float>(rect.width) / static_cast<float>(rect.height);
+	if (aspect_ratio >= 0.85 || aspect_ratio <= 1.15) {
+		return std::nullopt;
+	}
+
+	return rect;
+}
+
 //cv::Mat CubeVision::makeCombinedColorMask(const cv::Mat& yuv_norm)
 //{
 //	cv::Mat mask_red, mask_orange, mask_blue, mask_green, mask_white, mask_yellow;
