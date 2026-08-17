@@ -30,10 +30,10 @@ int main()
 	};
 	CubeVision::BgrColor display_colors[COLOR_COUNT] = {
 		{255, 255, 255}, // U_COLOR (white)
-		{255, 0, 0},     // R_COLOR (red)
+		{0, 0, 255},     // R_COLOR (red)
 		{0, 255, 0},     // F_COLOR (green)
 		{255, 255, 0},   // D_COLOR (yellow)
-		{0, 0, 255},     // L_COLOR (blue)
+		{255, 0, 0},     // L_COLOR (blue)
 		{0, 165, 255}    // B_COLOR (orange)
 	};
     CubeVision::Config my_cfg = {
@@ -65,10 +65,16 @@ int main()
         cv::Mat yuv = cubeVision.normalizeYuv(frame);
 		cv::Mat combined_mask = cv::Mat::zeros(yuv.size(), CV_8UC1);
 		std::array<cv::Mat, COLOR_COUNT> masks = cubeVision.detectCellColors(yuv, combined_mask);
+        std::optional<cv::Rect> my_rect = cubeVision.extractCubeFaceRect(combined_mask, masks);
+
+        if (my_rect.has_value()) {
+            std::cout << "Rect found" << std::endl;
+        }
+
         cv::Mat output = cv::Mat::zeros(yuv.size(), CV_8UC3);;
 		for (int i = 0; i < COLOR_COUNT; ++i)
 		{
-		    cv:add(masks[i], output, output);
+		    cv::add(masks[i], output, output);
 		}
 
 		cv::imshow("Camera Feed", output);

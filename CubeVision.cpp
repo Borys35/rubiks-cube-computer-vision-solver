@@ -45,6 +45,7 @@ std::array<cv::Mat, COLOR_COUNT> CubeVision::detectCellColors(const cv::Mat& yuv
 	std::array<cv::Mat, COLOR_COUNT> masks;
 	for (int i = 0; i < COLOR_COUNT; ++i)
 	{
+		masks[i] = cv::Mat::zeros(combined_mask.size(), combined_mask.type());
 		const ColorRange& range = cfg.color_ranges[i];
 		cv::inRange(yuv_frame,
 			cv::Scalar(range.y_range.min, range.u_range.min, range.v_range.min),
@@ -64,7 +65,7 @@ std::array<cv::Mat, COLOR_COUNT> CubeVision::detectCellColors(const cv::Mat& yuv
 	return masks;
 }
 
-std::optional<cv::Rect> CubeVision::extractCubeFaceRect(const cv::Mat& combined_mask, const cv::Mat& frame, std::array<cv::Mat, COLOR_COUNT> masks)
+std::optional<cv::Rect> CubeVision::extractCubeFaceRect(const cv::Mat& combined_mask, std::array<cv::Mat, COLOR_COUNT> masks)
 {
 	// cv::findContours(combined_mask)
 	std::vector<std::vector<cv::Point>> contours;
@@ -84,7 +85,7 @@ std::optional<cv::Rect> CubeVision::extractCubeFaceRect(const cv::Mat& combined_
 	}
 
 	cv::Mat cube_region = cv::Mat::zeros(combined_mask.size(), combined_mask.type());
-	int largest_idx = std::distance(contours.begin(), largest);
+	int largest_idx = static_cast<int>(std::distance(contours.begin(), largest));
 
 	cv::drawContours(cube_region, contours, largest_idx, cv::Scalar(255), cv::FILLED);
 
@@ -95,7 +96,12 @@ std::optional<cv::Rect> CubeVision::extractCubeFaceRect(const cv::Mat& combined_
 	cv::dilate(cube_region, dilated_region, kernel, cv::Point(-1, -1), 1);
 
 	cv::Mat touching;
-	cv::bitwise_and(masks[U_COLOR], dilated_region, touching);
+
+	std::array<cv::Mat, COLOR_COUNT> colorless_masks;
+	for (int i = 0; i < COLOR_COUNT; i++) {
+		cv::cvtColor(masks[i], colorless_masks[i], cv::COLOR_BGR2GRAY);
+	}
+	cv::bitwise_and(colorless_masks[U_COLOR], dilated_region, touching);
 	
 	cube_region.setTo(cv::Scalar(255), touching);
 
@@ -104,6 +110,7 @@ std::optional<cv::Rect> CubeVision::extractCubeFaceRect(const cv::Mat& combined_
 	std::vector<std::vector<cv::Point>> region_contours;
 	cv::findContours(cube_region, region_contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 	if (region_contours.empty()) {
+		std::cout << "region_contours.empty()" << std::endl;
 		return std::nullopt;
 	}
 
@@ -117,12 +124,15 @@ std::optional<cv::Rect> CubeVision::extractCubeFaceRect(const cv::Mat& combined_
 	double hull_area = cv::contourArea(hull);
 
 	if (hull_area > 0.0 && (region_area / hull_area) < cfg.min_solidity) {
+		std::cout << "no solidity" << std::endl;
 		return std::nullopt;
 	}
 
 	cv::Rect rect = cv::minAreaRect(region_contour).boundingRect();
 	float aspect_ratio = static_cast<float>(rect.width) / static_cast<float>(rect.height);
-	if (aspect_ratio >= 0.85 || aspect_ratio <= 1.15) {
+	if (aspect_ratio <= 0.85 || aspect_ratio >= 1.15) {
+
+		std::cout << "bad aspect ratio: " << aspect_ratio << std::endl;
 		return std::nullopt;
 	}
 

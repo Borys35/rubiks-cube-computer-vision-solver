@@ -44,7 +44,7 @@ public:
 
 	cv::Mat normalizeYuv(const cv::Mat& bgr_frame); // Returns YUV frame with normalized U and V channels
 	std::array<cv::Mat, COLOR_COUNT> detectCellColors(const cv::Mat& yuv_frame, cv::Mat& combined_mask); // Returns a color-coded frame. Can be converted to a combined mask
-	std::optional<cv::Rect> extractCubeFaceRect(const cv::Mat& combined_mask, const cv::Mat& frame, std::array<cv::Mat, COLOR_COUNT> masks); // Returns BoundingBox of the detected cube face
+	std::optional<cv::Rect> extractCubeFaceRect(const cv::Mat& combined_mask, std::array<cv::Mat, COLOR_COUNT> masks); // Returns BoundingBox of the detected cube face
 	void registerFrame(const cv::Mat& frame, const BoundingBox& detected_box); // Registers a frame and its detected bounding box for stability checking
 private:
 	Config cfg;
