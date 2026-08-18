@@ -6,6 +6,7 @@
 #include "color.hpp"
 
 using FaceletCube = std::array<Color, 54>;
+using FaceletFace = std::array<Color, 9>;
 
 class CubieCube
 {

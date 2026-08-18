@@ -65,7 +65,7 @@ std::array<cv::Mat, COLOR_COUNT> CubeVision::detectCellColors(const cv::Mat& yuv
 	return masks;
 }
 
-std::optional<cv::Rect> CubeVision::extractCubeFaceRect(const cv::Mat& combined_mask, std::array<cv::Mat, COLOR_COUNT> masks)
+std::optional<cv::Rect> CubeVision::extractCubeFaceRect(const cv::Mat& combined_mask, const std::array<cv::Mat, COLOR_COUNT>& masks)
 {
 	// cv::findContours(combined_mask)
 	std::vector<std::vector<cv::Point>> contours;
@@ -157,7 +157,7 @@ float CubeVision::iou(const cv::Rect& rect1, const cv::Rect& rect2) {
 		return static_cast<float>(inter) / static_cast<float>(uni);
 }
 
-void CubeVision::registerRect(const std::optional<cv::Rect>& rect) {
+bool CubeVision::registerRect(const std::optional<cv::Rect>& rect) {
 	if (rect.has_value()) {
 		if (prev_rect.has_value() && iou(prev_rect.value(), rect.value()) >= cfg.iou_threshold) {
 			stable_frames++;
@@ -170,11 +170,44 @@ void CubeVision::registerRect(const std::optional<cv::Rect>& rect) {
 		if (stable_frames >= cfg.stable_frame_count) {
 			std::cout << "Stable cube face detected" << std::endl;
 			stable_frames = 0;
+			return true;
 		}
 	}
 	else {
 		stable_frames = 0;
 		prev_rect = std::nullopt;
+	}
+	return false;
+}
+
+void CubeVision::readFaceState(const cv::Rect& rect, const std::array<cv::Mat, COLOR_COUNT>& masks) {
+	int cell_width = rect.width / 3;
+	int cell_height = rect.height / 3;
+	
+	for (int i = 0; i < 3; ++i) {
+		for (int j = 0; j < 3; ++j) {
+			cv::Rect cell_rect(rect.x + j * cell_width, rect.y + i * cell_height, cell_width, cell_height);
+			Color max_color = U_COLOR;
+			int max_color_count = 0;
+			for (int k = 0; k < COLOR_COUNT; ++k) {
+				cv::Rect safe_rect = cell_rect & cv::Rect(0, 0, masks[k].cols, masks[k].rows);
+				cv::Mat cell_mask = masks[k](safe_rect);
+				cv::Mat single_channel;
+				cv::cvtColor(cell_mask, single_channel, cv::COLOR_BGR2GRAY);
+				int color_count = cv::countNonZero(single_channel);
+				if (color_count > max_color_count) {
+					max_color_count = color_count;
+					max_color = static_cast<Color>(k);
+				}
+			}
+
+			if (max_color_count > cfg.min_cell_ratio * cell_width * cell_height) {
+				std::cout << "Cell (" << i << ", " << j << ") color: " << max_color << std::endl;
+			}
+			else {
+				std::cout << "Cell (" << i << ", " << j << ") color: Unknown" << std::endl;
+			}
+		}
 	}
 }
 

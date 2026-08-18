@@ -45,6 +45,7 @@ int main()
         },
         .stable_frame_count = 5,
         .iou_threshold = 0.8f,
+        .min_area_ratio = 0.075f,
         .min_solidity = 0.9f,
         .max_angle = 10.0f
     };
@@ -78,7 +79,11 @@ int main()
             cv::rectangle(output, my_rect.value(), cv::Scalar(200, 200, 200));
         }
 
-		cubeVision.registerRect(my_rect);
+		if (cubeVision.registerRect(my_rect)) {
+            if (my_rect.has_value()) {
+                cubeVision.readFaceState(my_rect.value(), masks);
+            }
+		}
 
         cv::Mat combined_image;
         cv::hconcat(frame, output, combined_image);
