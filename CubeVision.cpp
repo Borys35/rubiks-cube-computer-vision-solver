@@ -183,11 +183,12 @@ bool CubeVision::registerRect(const std::optional<cv::Rect>& rect) {
 void CubeVision::readFaceState(const cv::Rect& rect, const std::array<cv::Mat, COLOR_COUNT>& masks) {
 	int cell_width = rect.width / 3;
 	int cell_height = rect.height / 3;
+	FaceletFace facelet_face;
 	
 	for (int i = 0; i < 3; ++i) {
 		for (int j = 0; j < 3; ++j) {
 			cv::Rect cell_rect(rect.x + j * cell_width, rect.y + i * cell_height, cell_width, cell_height);
-			Color max_color = U_COLOR;
+			Color max_color = UNKNOWN_COLOR;
 			int max_color_count = 0;
 			for (int k = 0; k < COLOR_COUNT; ++k) {
 				cv::Rect safe_rect = cell_rect & cv::Rect(0, 0, masks[k].cols, masks[k].rows);
@@ -200,14 +201,23 @@ void CubeVision::readFaceState(const cv::Rect& rect, const std::array<cv::Mat, C
 					max_color = static_cast<Color>(k);
 				}
 			}
-
-			if (max_color_count > cfg.min_cell_ratio * cell_width * cell_height) {
-				std::cout << "Cell (" << i << ", " << j << ") color: " << max_color << std::endl;
-			}
-			else {
-				std::cout << "Cell (" << i << ", " << j << ") color: Unknown" << std::endl;
-			}
+			facelet_face[i * 3 + j] = max_color;
 		}
+	}
+
+	std::cout << "Detected face state: ";
+	for (int i = 0; i < 9; ++i) {
+		std::cout << facelet_face[i] << " ";
+	}
+	std::cout << std::endl;
+}
+
+void CubeVision::reset() {
+	stable_frames = 0;
+	prev_rect = std::nullopt;
+	current_facelet_cube = FaceletCube();
+	for (int i = 0; i < 54; ++i) {
+		current_facelet_cube[i] = UNKNOWN_COLOR;
 	}
 }
 

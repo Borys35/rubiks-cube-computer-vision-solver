@@ -1,6 +1,7 @@
 #pragma once
 #include <opencv2/opencv.hpp>
 #include "include/color.hpp"
+#include "include/cubie_cube.hpp"
 
 class CubeVision
 {
@@ -34,18 +35,22 @@ public:
 		float max_angle = 5.0f;
 	};
 
-	CubeVision(const Config& config) : cfg(config) {}
+	CubeVision(const Config& config) : cfg(config) {
+		reset();
+	}
 
 	cv::Mat normalizeYuv(const cv::Mat& bgr_frame); // Returns YUV frame with normalized U and V channels
 	std::array<cv::Mat, COLOR_COUNT> detectCellColors(const cv::Mat& yuv_frame, cv::Mat& combined_mask); // Returns a color-coded frame. Can be converted to a combined mask
 	std::optional<cv::Rect> extractCubeFaceRect(const cv::Mat& combined_mask, const std::array<cv::Mat, COLOR_COUNT>& masks); // Returns BoundingBox of the detected cube face
 	bool registerRect(const std::optional<cv::Rect>& rect); // Registers a rect
 	void readFaceState(const cv::Rect& rect, const std::array<cv::Mat, COLOR_COUNT>& masks);
+	void reset();
 private:
 	Config cfg;
 
 	uint stable_frames;
 	std::optional<cv::Rect> prev_rect;
+	FaceletCube current_facelet_cube;
 
 	float iou(const cv::Rect& rect1, const cv::Rect& rect2);
 };
