@@ -45,6 +45,7 @@ public:
 	bool registerRect(const std::optional<cv::Rect>& rect); // Registers a rect
 	void readFaceState(const cv::Rect& rect, const std::array<cv::Mat, COLOR_COUNT>& masks);
 	void reset();
+	FaceletCube getCurrentFaceletCube() const { return current_facelet_cube; }
 private:
 	Config cfg;
 

@@ -7,6 +7,8 @@
 #include "include/kociemba_solver.hpp"
 #include "include/pruning_tables.hpp"
 #include "CubeVision.h"
+#include "OpenCV2DVisualizer.h"
+#include "MenuManager.h"
 #include <opencv2/opencv.hpp>
 #include <vector>
 #include <algorithm>
@@ -51,6 +53,8 @@ int main()
     };
 
 	CubeVision cubeVision(my_cfg);
+    OpenCV2DVisualizer visualizer = OpenCV2DVisualizer();
+	MenuManager menuManager(cubeVision, visualizer);
 
     while (true)
     {
@@ -63,36 +67,11 @@ int main()
             break;
         }
 
-
-        cv::Mat yuv = cubeVision.normalizeYuv(frame);
-		cv::Mat combined_mask = cv::Mat::zeros(yuv.size(), CV_8UC1);
-		std::array<cv::Mat, COLOR_COUNT> masks = cubeVision.detectCellColors(yuv, combined_mask);
-        std::optional<cv::Rect> my_rect = cubeVision.extractCubeFaceRect(combined_mask, masks);
-
-        cv::Mat output = cv::Mat::zeros(yuv.size(), CV_8UC3);;
-		for (int i = 0; i < COLOR_COUNT; ++i)
+		if (!menuManager.update(frame))
 		{
-		    cv::add(masks[i], output, output);
-		}
-
-        if (my_rect.has_value()) {
-            cv::rectangle(output, my_rect.value(), cv::Scalar(200, 200, 200));
-        }
-
-		if (cubeVision.registerRect(my_rect)) {
-            if (my_rect.has_value()) {
-                cubeVision.readFaceState(my_rect.value(), masks);
-            }
-		}
-
-        cv::Mat combined_image;
-        cv::hconcat(frame, output, combined_image);
-		cv::imshow("Camera | Output", combined_image);
-
-        if (cv::waitKey(1) == 'q')
-        {
             break;
-        }
+		}
+        
     }
 
     return 0;

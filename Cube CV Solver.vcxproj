@@ -149,6 +149,8 @@
   <ItemGroup>
     <ClCompile Include="CubeVision.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MenuManager.cpp" />
+    <ClCompile Include="OpenCV2DVisualizer.cpp" />
     <ClCompile Include="src\bfs_solver.cpp" />
     <ClCompile Include="src\cubie_cube.cpp" />
     <ClCompile Include="src\kociemba_solver.cpp" />
@@ -172,6 +174,8 @@
     <ClInclude Include="include\pruning_tables.hpp" />
     <ClInclude Include="include\terminal_visualizer.hpp" />
     <ClInclude Include="include\visualizer.hpp" />
+    <ClInclude Include="MenuManager.h" />
+    <ClInclude Include="OpenCV2DVisualizer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
