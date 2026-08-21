@@ -15,6 +15,9 @@
 
 int main()
 {
+    MoveTables::init_move_tables();
+    Kociemba::PruningTables::init_all_pruning_tables();
+
     cv::VideoCapture cap(0);
     if (!cap.isOpened())
     {
@@ -23,20 +26,20 @@ int main()
     }
 
 	CubeVision::ColorRange color_ranges[COLOR_COUNT] = {
-		{{148, 255}, {135, 156}, {31, 255}}, // U_COLOR (white)
-		{{104, 143}, {0, 255}, {167, 255}}, // R_COLOR (red)
-		{{13, 255}, {120, 177}, {10, 86}}, // F_COLOR (green)
-		{{0, 255}, {0, 112}, {107, 133}}, // D_COLOR (yellow)
+		{{148, 255}, {135, 156}, {31, 255}},  // U_COLOR (white)
+		{{104, 143}, {0, 255}, {167, 255}},   // R_COLOR (red)
+		{{13, 255}, {120, 177}, {10, 86}},    // F_COLOR (green)
+		{{0, 255}, {0, 112}, {107, 133}},     // D_COLOR (yellow)
         {{167, 203}, {52, 148}, {160, 250}},  // L_COLOR (orange)
-		{{0, 117}, {140, 250}, {0, 110}} // B_COLOR (blue)
+		{{0, 117}, {140, 250}, {0, 110}}      // B_COLOR (blue)
 	};
 	CubeVision::BgrColor display_colors[COLOR_COUNT] = {
 		{255, 255, 255}, // U_COLOR (white)
 		{0, 0, 255},     // R_COLOR (red)
 		{0, 255, 0},     // F_COLOR (green)
 		{0, 255, 255},   // D_COLOR (yellow)
-        {0, 165, 255},     // L_COLOR (orange)
-        {255, 0, 0}, // B_COLOR (blue)
+        {0, 165, 255},   // L_COLOR (orange)
+        {255, 0, 0},     // B_COLOR (blue)
 	};
     CubeVision::Config my_cfg = {
         .color_ranges = {
@@ -55,7 +58,7 @@ int main()
 	CubeVision cubeVision(my_cfg);
     OpenCV2DVisualizer visualizer = OpenCV2DVisualizer();
 	CubieCube currentCube = CubieCube();
-	Kociemba::KociembaSolver solver = Kociemba::KociembaSolver(6, 4);
+	Kociemba::KociembaSolver solver = Kociemba::KociembaSolver(6u, 4u);
 	MenuManager menuManager(cubeVision, visualizer, currentCube, solver);
 
     while (true)
@@ -80,6 +83,8 @@ int main()
 }
 
 /*
+// 0 0 0 0 0 0 0 0 0 4 4 4 1 1 1 1 1 1 5 5 5 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 1 1 1 4 4 4 4 4 4 2 2 2 5 5 5 5 5 5 <- U2 from cv
+// 0 0 0 0 0 0 0 0 0 4 4 4 1 1 1 1 1 1 5 5 5 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 1 1 1 4 4 4 4 4 4 2 2 2 5 5 5 5 5 5
 int main()
 {
     MoveTables::init_move_tables();
@@ -87,7 +92,8 @@ int main()
 
     CubieCube cc = CubieCube();
 
-    std::string scramble_string = "R L F' D' F R' U2 B' R D' R2 B2 U R2 F2 B2 R2 U D2 L2";
+    // std::string scramble_string = "R L F' D' F R' U2 B' R D' R2 B2 U R2 F2 B2 R2 U D2 L2";
+    std::string scramble_string = "U2";
     std::cout << "Scramble: " << scramble_string << std::endl;
 
     std::vector<int> scramble_moves = string_to_moves(scramble_string);
@@ -96,12 +102,18 @@ int main()
         cc.multiply(ALL_MOVES[scramble_moves[i]]);
     }
 
+	cc.from_facelet_cube(cc.to_facelet_cube()); // Ensure the cube is in a valid state after scrambling
+	std::cout << "Scrambled cube state: ";
+	for (size_t i = 0; i < 54; i++)
+	{
+		std::cout << cc.to_facelet_cube()[i] << " ";
+	}
     Visualizer *visualizer = new TerminalVisualizer();
     visualizer->display_cube(cc.to_facelet_cube());
 
     // ISolver *solver = new BFSSolver(max_depth_total);
-    auto max_depth_total{22u};
-    auto max_depth1{12u};
+    auto max_depth_total{6u};
+    auto max_depth1{4u};
     ISolver *solver = new Kociemba::KociembaSolver(max_depth_total, max_depth1);
     std::vector<int> solve_moves = solver->solve(cc);
 
@@ -112,5 +124,4 @@ int main()
     delete solver;
 
     return 0;
-}
-*/
+}*/

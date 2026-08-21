@@ -67,7 +67,6 @@ std::array<cv::Mat, COLOR_COUNT> CubeVision::detectCellColors(const cv::Mat& yuv
 
 std::optional<cv::Rect> CubeVision::extractCubeFaceRect(const cv::Mat& combined_mask, const std::array<cv::Mat, COLOR_COUNT>& masks)
 {
-	// cv::findContours(combined_mask)
 	std::vector<std::vector<cv::Point>> contours;
 	cv::findContours(combined_mask, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 

@@ -3,6 +3,7 @@
 #include "CubeVision.h"
 #include "OpenCV2DVisualizer.h"
 #include "include/i_solver.hpp"
+#include "include/kociemba_solver.hpp"
 #include <opencv2/opencv.hpp>
 #include <thread>
 

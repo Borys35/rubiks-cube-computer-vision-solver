@@ -36,8 +36,9 @@ bool MenuManager::isCubeCaptured() const {
 }
 
 bool MenuManager::isCubeSolvable() const {
-	currentCube.from_facelet_cube(cubeVision.getCurrentFaceletCube());
-    return currentCube.is_solvable();
+    CubieCube tempCube;
+	tempCube.from_facelet_cube(cubeVision.getCurrentFaceletCube());
+    return tempCube.is_solvable();
 }
 
 bool MenuManager::update(cv::Mat& frame) {
@@ -83,7 +84,8 @@ bool MenuManager::update(cv::Mat& frame) {
     if (key == 'q')
     {
 		return false; // Exit the loop if 'q' is pressed
-    } else if (key == 'r')
+    } 
+    else if (key == 'r')
 	{
 		std::cout << "Resetting cube state..." << std::endl;
 		cubeVision.reset();
@@ -93,6 +95,9 @@ bool MenuManager::update(cv::Mat& frame) {
         if (!currently_solving) {
             // TODO: move to a separate thread to avoid blocking the main loop
             std::cout << "Getting solve..." << std::endl;
+            if (solver_thread.joinable()) {
+                solver_thread.join();
+            }
             solver_thread = std::thread(&MenuManager::solveCube, this);
         }
 	}
@@ -102,7 +107,14 @@ bool MenuManager::update(cv::Mat& frame) {
 
 void MenuManager::solveCube() {
     currently_solving = true;
-    std::vector<int> solve_moves = solver.solve(currentCube);
+    std::cout << "Current facelet state: ";
+    CubieCube tempCube;
+    tempCube.from_facelet_cube(cubeVision.getCurrentFaceletCube());
+    for (int i = 0; i < 54; ++i) {
+        std::cout << tempCube.to_facelet_cube()[i] << " ";
+    }
+    std::cout << std::endl;
+    std::vector<int> solve_moves = solver.solve(tempCube);
     currently_solving = false;
     std::cout << "Solved: " << moves_to_string(solve_moves) << " (" << solve_moves.size() << " moves)" << std::endl;
 }
