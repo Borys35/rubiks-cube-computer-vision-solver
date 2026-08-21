@@ -13,9 +13,9 @@ public:
 				CubeVision::BgrColor{255, 255, 255}, // U_COLOR (white)
 				CubeVision::BgrColor{0, 0, 255},     // R_COLOR (red)
 				CubeVision::BgrColor{0, 255, 0},     // F_COLOR (green)
-				CubeVision::BgrColor{255, 255, 0},   // D_COLOR (yellow)
-				CubeVision::BgrColor{255, 0, 0},     // L_COLOR (blue)
-				CubeVision::BgrColor{0, 165, 255},    // B_COLOR (orange)
+				CubeVision::BgrColor{0, 255, 255},   // D_COLOR (yellow)
+				CubeVision::BgrColor{0, 165, 255},    // L_COLOR (orange)
+				CubeVision::BgrColor{255, 0, 0},     // B_COLOR (blue)
 				CubeVision::BgrColor{10, 29, 61}    // UKNOWN_COLOR (brown)
 		};
 	}

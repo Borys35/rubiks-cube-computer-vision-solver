@@ -17,8 +17,11 @@ void MenuManager::updateMenuPanel() {
 		}
 		else
 		{
-			cv::putText(menu_panel, "Current step: Cube is solvable. [s] Get solve", cv::Point(20, 150), cv::FONT_HERSHEY_SIMPLEX, 0.6, cv::Scalar(0, 255, 0), 2);
-		}
+            if (!currently_solving)
+			    cv::putText(menu_panel, "Current step: Cube is solvable. [s] Get solve", cv::Point(20, 150), cv::FONT_HERSHEY_SIMPLEX, 0.6, cv::Scalar(0, 255, 0), 2);
+            else
+                cv::putText(menu_panel, "Current step: Wait for the solve...", cv::Point(20, 150), cv::FONT_HERSHEY_SIMPLEX, 0.6, cv::Scalar(0, 255, 0), 2);
+        }
     }
 }
 
@@ -85,10 +88,21 @@ bool MenuManager::update(cv::Mat& frame) {
 		std::cout << "Resetting cube state..." << std::endl;
 		cubeVision.reset();
 	}
-	else if (key == 's')
-	{
-		std::cout << "Getting solve..." << std::endl;
+    else if (key == 's')
+    {
+        if (!currently_solving) {
+            // TODO: move to a separate thread to avoid blocking the main loop
+            std::cout << "Getting solve..." << std::endl;
+            solver_thread = std::thread(&MenuManager::solveCube, this);
+        }
 	}
 
     return true;
+}
+
+void MenuManager::solveCube() {
+    currently_solving = true;
+    std::vector<int> solve_moves = solver.solve(currentCube);
+    currently_solving = false;
+    std::cout << "Solved: " << moves_to_string(solve_moves) << " (" << solve_moves.size() << " moves)" << std::endl;
 }

@@ -24,19 +24,19 @@ int main()
 
 	CubeVision::ColorRange color_ranges[COLOR_COUNT] = {
 		{{148, 255}, {135, 156}, {31, 255}}, // U_COLOR (white)
-		{{78, 255}, {0, 255}, {167, 255}}, // R_COLOR (red)
+		{{104, 143}, {0, 255}, {167, 255}}, // R_COLOR (red)
 		{{13, 255}, {120, 177}, {10, 86}}, // F_COLOR (green)
 		{{0, 255}, {0, 112}, {107, 133}}, // D_COLOR (yellow)
-		{{0, 117}, {140, 250}, {0, 110}}, // L_COLOR (blue)
-		{{140, 210}, {52, 148}, {160, 250}}  // B_COLOR (orange)
+        {{167, 203}, {52, 148}, {160, 250}},  // L_COLOR (orange)
+		{{0, 117}, {140, 250}, {0, 110}} // B_COLOR (blue)
 	};
 	CubeVision::BgrColor display_colors[COLOR_COUNT] = {
 		{255, 255, 255}, // U_COLOR (white)
 		{0, 0, 255},     // R_COLOR (red)
 		{0, 255, 0},     // F_COLOR (green)
-		{255, 255, 0},   // D_COLOR (yellow)
-		{255, 0, 0},     // L_COLOR (blue)
-		{0, 165, 255}    // B_COLOR (orange)
+		{0, 255, 255},   // D_COLOR (yellow)
+        {0, 165, 255},     // L_COLOR (orange)
+        {255, 0, 0}, // B_COLOR (blue)
 	};
     CubeVision::Config my_cfg = {
         .color_ranges = {
@@ -55,7 +55,8 @@ int main()
 	CubeVision cubeVision(my_cfg);
     OpenCV2DVisualizer visualizer = OpenCV2DVisualizer();
 	CubieCube currentCube = CubieCube();
-	MenuManager menuManager(cubeVision, visualizer, currentCube);
+	Kociemba::KociembaSolver solver = Kociemba::KociembaSolver(6, 4);
+	MenuManager menuManager(cubeVision, visualizer, currentCube, solver);
 
     while (true)
     {
