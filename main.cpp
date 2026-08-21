@@ -54,7 +54,8 @@ int main()
 
 	CubeVision cubeVision(my_cfg);
     OpenCV2DVisualizer visualizer = OpenCV2DVisualizer();
-	MenuManager menuManager(cubeVision, visualizer);
+	CubieCube currentCube = CubieCube();
+	MenuManager menuManager(cubeVision, visualizer, currentCube);
 
     while (true)
     {

@@ -3,9 +3,38 @@
 void MenuManager::updateMenuPanel() {
 	menu_panel.setTo(cv::Scalar(50, 50, 50));
 
-	cv::putText(menu_panel, "Cube Solver", cv::Point(20, 40), cv::FONT_HERSHEY_TRIPLEX, 1.0, cv::Scalar(255, 255, 255), 2);
-    cv::putText(menu_panel, "[q] Quit", cv::Point(20, 70), cv::FONT_HERSHEY_DUPLEX, 0.5, cv::Scalar(255, 255, 255), 2);
-    cv::putText(menu_panel, "[r] Reset", cv::Point(20, 100), cv::FONT_HERSHEY_TRIPLEX, 0.5, cv::Scalar(255, 255, 255), 2);
+	cv::putText(menu_panel, "Real-time Rubik's Cube Solver", cv::Point(20, 40), cv::FONT_HERSHEY_TRIPLEX, 1.0, cv::Scalar(255, 255, 255), 2);
+    cv::putText(menu_panel, "[q] Quit", cv::Point(20, 70), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255, 255, 255), 2);
+    cv::putText(menu_panel, "[r] Reset", cv::Point(20, 100), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255, 255, 255), 2);
+    if (!isCubeCaptured())
+    {
+        cv::putText(menu_panel, "Current step: Capture cube", cv::Point(20, 150), cv::FONT_HERSHEY_SIMPLEX, 0.6, cv::Scalar(0, 0, 255), 2);
+    }
+    else {
+		if (!isCubeSolvable())
+		{
+			cv::putText(menu_panel, "Current step: Cube is not solvable. Capture again.", cv::Point(20, 150), cv::FONT_HERSHEY_SIMPLEX, 0.6, cv::Scalar(0, 0, 255), 2);
+		}
+		else
+		{
+			cv::putText(menu_panel, "Current step: Cube is solvable. [s] Get solve", cv::Point(20, 150), cv::FONT_HERSHEY_SIMPLEX, 0.6, cv::Scalar(0, 255, 0), 2);
+		}
+    }
+}
+
+bool MenuManager::isCubeCaptured() const {
+	FaceletCube current_facelet_cube = cubeVision.getCurrentFaceletCube();
+	for (int i = 0; i < 54; ++i) {
+		if (current_facelet_cube[i] == UNKNOWN_COLOR) {
+			return false;
+		}
+	}
+    return true;
+}
+
+bool MenuManager::isCubeSolvable() const {
+	currentCube.from_facelet_cube(cubeVision.getCurrentFaceletCube());
+    return currentCube.is_solvable();
 }
 
 bool MenuManager::update(cv::Mat& frame) {
@@ -35,23 +64,30 @@ bool MenuManager::update(cv::Mat& frame) {
     visualizer.display_cube(cubeVision.getCurrentFaceletCube());
     cv::Mat visualizer_output = visualizer.get_mat();
     cv::Mat left_image;
+    cv::putText(visualizer_output, "Visualizer", cv::Point(20, 40), cv::FONT_HERSHEY_TRIPLEX, 0.8, cv::Scalar(255, 255, 255), 2);
     cv::vconcat(menu_panel, visualizer_output, left_image);
 
     cv::Mat right_image;
+	cv::putText(frame, "Camera", cv::Point(20, 40), cv::FONT_HERSHEY_TRIPLEX, 0.8, cv::Scalar(0, 0, 0), 2);
+    cv::putText(output, "Output Masks", cv::Point(20, 40), cv::FONT_HERSHEY_TRIPLEX, 0.8, cv::Scalar(255, 255, 255), 2);
     cv::vconcat(frame, output, right_image);
 
 	cv::Mat combined_output;
 	cv::hconcat(left_image, right_image, combined_output);
     cv::imshow("Cube Solver", combined_output);
 
-    if (cv::waitKey(1) == 'q')
+	int key = cv::waitKey(1);
+    if (key == 'q')
     {
 		return false; // Exit the loop if 'q' is pressed
-    }
-
-	if (cv::waitKey(1) == 'r')
+    } else if (key == 'r')
 	{
+		std::cout << "Resetting cube state..." << std::endl;
 		cubeVision.reset();
+	}
+	else if (key == 's')
+	{
+		std::cout << "Getting solve..." << std::endl;
 	}
 
     return true;
