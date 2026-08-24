@@ -12,7 +12,7 @@
 #include <opencv2/opencv.hpp>
 #include <vector>
 #include <algorithm>
-
+/*
 int main()
 {
     MoveTables::init_move_tables();
@@ -58,7 +58,7 @@ int main()
 	CubeVision cubeVision(my_cfg);
     OpenCV2DVisualizer visualizer = OpenCV2DVisualizer();
 	CubieCube currentCube = CubieCube();
-	Kociemba::KociembaSolver solver = Kociemba::KociembaSolver(6u, 4u);
+	Kociemba::KociembaSolver solver = Kociemba::KociembaSolver(25u, 25u, 21u);
 	MenuManager menuManager(cubeVision, visualizer, currentCube, solver);
 
     while (true)
@@ -80,9 +80,9 @@ int main()
     }
 
     return 0;
-}
+}*/
 
-/*
+
 // 0 0 0 0 0 0 0 0 0 4 4 4 1 1 1 1 1 1 5 5 5 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 1 1 1 4 4 4 4 4 4 2 2 2 5 5 5 5 5 5 <- U2 from cv
 // 0 0 0 0 0 0 0 0 0 4 4 4 1 1 1 1 1 1 5 5 5 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 1 1 1 4 4 4 4 4 4 2 2 2 5 5 5 5 5 5
 int main()
@@ -92,8 +92,7 @@ int main()
 
     CubieCube cc = CubieCube();
 
-    // std::string scramble_string = "R L F' D' F R' U2 B' R D' R2 B2 U R2 F2 B2 R2 U D2 L2";
-    std::string scramble_string = "U2";
+    std::string scramble_string = "U2 R";
     std::cout << "Scramble: " << scramble_string << std::endl;
 
     std::vector<int> scramble_moves = string_to_moves(scramble_string);
@@ -112,9 +111,9 @@ int main()
     visualizer->display_cube(cc.to_facelet_cube());
 
     // ISolver *solver = new BFSSolver(max_depth_total);
-    auto max_depth_total{6u};
-    auto max_depth1{4u};
-    ISolver *solver = new Kociemba::KociembaSolver(max_depth_total, max_depth1);
+    auto max_depth_total{20u};
+    auto acceptable_length{20u};
+    ISolver *solver = new Kociemba::KociembaSolver(max_depth_total, acceptable_length);
     std::vector<int> solve_moves = solver->solve(cc);
 
     // Solve: R' U2 R' L
@@ -124,4 +123,4 @@ int main()
     delete solver;
 
     return 0;
-}*/
+}

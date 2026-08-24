@@ -12,13 +12,40 @@ namespace Kociemba
         max_depth = max_depth_total;
         std::vector<int> p1_moves{};
         // Phase 1 IDA*
-        for (int depth1 = 0; depth1 <= max_depth1; depth1++)
+        for (int depth1 = 0; depth1 <= max_depth; depth1++)
         {
+            if (!best_solution.empty() && best_solution.size() <= acceptable_length)
+            {
+                break; // already found a solution within the max length
+            }
             std::cout << "Searching phase 1 with depth " << depth1 << std::endl;
             search_phase1(cc, depth1, p1_moves);
         }
+	    optimize_solution(best_solution);
         return best_solution;
     }
+
+	void KociembaSolver::optimize_solution(std::vector<int>& solution)
+	{
+        size_t write_idx = 0;
+
+        for (int m : solution) {
+            if (write_idx == 0 || solution[write_idx - 1] / 3 != m / 3) {
+                solution[write_idx++] = m;
+            }
+            else {
+                int last = solution[--write_idx];
+                int turns = ((last % 3) + 1 + (m % 3) + 1) % 4;
+
+                if (turns != 0) {
+                    solution[write_idx++] = (last / 3) * 3 + (turns - 1);
+                }
+            }
+        }
+
+		std::cout << "Optimized solution length: " << write_idx << std::endl;
+        solution.resize(write_idx);
+	}
 
     bool KociembaSolver::is_cube_in_g1_substate(const CubieCube &cc)
     {
@@ -47,6 +74,10 @@ namespace Kociemba
 
     void KociembaSolver::search_phase1(const CubieCube &state, int depth_left, std::vector<int> &p1_moves)
     {
+		if (!best_solution.empty() && best_solution.size() <= acceptable_length)
+		{
+			return; // already found a solution within the max length
+		}
         // pruning
         int co = state.get_co_coordinate();
         int eo = state.get_eo_coordinate();
@@ -97,6 +128,10 @@ namespace Kociemba
 
     void KociembaSolver::search_phase2(const CubieCube &state, int depth_left, std::vector<int> &p1_moves, std::vector<int> &p2_moves)
     {
+        if (!best_solution.empty() && best_solution.size() <= acceptable_length)
+        {
+            return; // already found a solution within the max length
+        }
         // pruning
         int cp = state.get_cp_coordinate();
         int ep8 = state.get_ep8_coordinate();

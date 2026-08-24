@@ -17,8 +17,6 @@ namespace Kociemba
             int solved_co = solved_cube.get_co_coordinate();
             int solved_ud = solved_cube.get_ud_slice_coordinate();
 
-            std::cout << "Generating CO-UD pruning table... Solved co: " << solved_co << " solved_ud: " << solved_ud << std::endl;
-
             PRUNING_CO_UD[solved_co * UD_SLICE_COUNT + solved_ud] = 0;
 
             int depth = 0;
