@@ -12,7 +12,7 @@
 #include <opencv2/opencv.hpp>
 #include <vector>
 #include <algorithm>
-/*
+
 int main()
 {
     MoveTables::init_move_tables();
@@ -25,14 +25,22 @@ int main()
         return -1;
     }
 
-	CubeVision::ColorRange color_ranges[COLOR_COUNT] = {
+	/*CubeVision::ColorRange color_ranges[COLOR_COUNT] = {
 		{{148, 255}, {135, 156}, {31, 255}},  // U_COLOR (white)
 		{{104, 143}, {0, 255}, {167, 255}},   // R_COLOR (red)
 		{{13, 255}, {120, 177}, {10, 86}},    // F_COLOR (green)
 		{{0, 255}, {0, 112}, {107, 133}},     // D_COLOR (yellow)
         {{167, 203}, {52, 148}, {160, 250}},  // L_COLOR (orange)
 		{{0, 117}, {140, 250}, {0, 110}}      // B_COLOR (blue)
-	};
+	};*/
+    CubeVision::ColorRange color_ranges[COLOR_COUNT] = {
+        {{148, 255}, {135, 156}, {31, 255}},  // U_COLOR (white)
+        {{78, 255}, {0, 255}, {167, 255}},    // R_COLOR (red)
+        {{13, 255}, {120, 177}, {10, 86}},    // F_COLOR (green)
+        {{0, 255}, {0, 112}, {107, 133}},     // D_COLOR (yellow)
+        {{140, 210}, {52, 148}, {160, 250}},  // L_COLOR (orange)
+        {{0, 117}, {140, 250}, {0, 110}}      // B_COLOR (blue)
+    };
 	CubeVision::BgrColor display_colors[COLOR_COUNT] = {
 		{255, 255, 255}, // U_COLOR (white)
 		{0, 0, 255},     // R_COLOR (red)
@@ -58,7 +66,7 @@ int main()
 	CubeVision cubeVision(my_cfg);
     OpenCV2DVisualizer visualizer = OpenCV2DVisualizer();
 	CubieCube currentCube = CubieCube();
-	Kociemba::KociembaSolver solver = Kociemba::KociembaSolver(25u, 25u, 21u);
+	Kociemba::KociembaSolver solver = Kociemba::KociembaSolver(25u, 20u);
 	MenuManager menuManager(cubeVision, visualizer, currentCube, solver);
 
     while (true)
@@ -80,9 +88,9 @@ int main()
     }
 
     return 0;
-}*/
+}
 
-
+/*
 // 0 0 0 0 0 0 0 0 0 4 4 4 1 1 1 1 1 1 5 5 5 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 1 1 1 4 4 4 4 4 4 2 2 2 5 5 5 5 5 5 <- U2 from cv
 // 0 0 0 0 0 0 0 0 0 4 4 4 1 1 1 1 1 1 5 5 5 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 1 1 1 4 4 4 4 4 4 2 2 2 5 5 5 5 5 5
 int main()
@@ -123,4 +131,4 @@ int main()
     delete solver;
 
     return 0;
-}
+}*/
