@@ -291,6 +291,19 @@ int CubieCube::get_ud_slice_perm_coordinate() const
 }
 
 bool CubieCube::is_solvable() const {
+	// check if every color appears exactly 9 times
+    FaceletCube fc = to_facelet_cube();
+    std::array<int, COLOR_COUNT> color_counts = { 0 };
+
+    for (int i = 0; i < 54; ++i) {
+        if (fc[i] == UNKNOWN_COLOR || fc[i] >= COLOR_COUNT) return false;
+        color_counts[fc[i]]++;
+    }
+
+    for (int count : color_counts) {
+        if (count != 9) return false;
+    }
+
     // sum check of co
     int sum = 0;
     for (int i = 0; i < CORNER_COUNT; i++) {

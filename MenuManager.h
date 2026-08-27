@@ -36,5 +36,7 @@ private:
 	cv::Mat menu_panel;
 	std::atomic<bool> currently_solving = false;
 	std::thread solver_thread;
+	std::vector<int> solution = {};
+	std::mutex solution_mutex;
 };
 

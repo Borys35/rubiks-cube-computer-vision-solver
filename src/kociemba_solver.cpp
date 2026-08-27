@@ -156,7 +156,7 @@ namespace Kociemba
                 best_solution.insert(best_solution.end(), p2_moves.begin(), p2_moves.end());
 
                 // shrink down total depth
-                max_depth = best_solution.size() - 1;
+                // max_depth = best_solution.size() - 1;
             }
             return;
         }
