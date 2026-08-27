@@ -66,7 +66,7 @@ int main()
 	CubeVision cubeVision(my_cfg);
     OpenCV2DVisualizer visualizer = OpenCV2DVisualizer();
 	CubieCube currentCube = CubieCube();
-	Kociemba::KociembaSolver solver = Kociemba::KociembaSolver(25u, 20u);
+	Kociemba::KociembaSolver solver = Kociemba::KociembaSolver(20u, 20u);
 	MenuManager menuManager(cubeVision, visualizer, currentCube, solver);
 
     while (true)
