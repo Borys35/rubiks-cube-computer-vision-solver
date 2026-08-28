@@ -6,7 +6,7 @@ namespace Kociemba
 {
     int max_depth = 0;
 
-    std::vector<int> KociembaSolver::solve(const CubieCube &cc)
+    std::vector<int> KociembaSolver::solve(const CubieCube &cc, std::stop_token stoken)
     {
         best_solution.clear();
         max_depth = max_depth_total;
@@ -18,10 +18,13 @@ namespace Kociemba
             {
                 break; // already found a solution within the max length
             }
+            if (stoken.stop_requested())
+            {
+                break; // stop requested
+            }
             std::cout << "Searching phase 1 with depth " << depth1 << std::endl;
-            search_phase1(cc, depth1, p1_moves);
+            search_phase1(cc, depth1, p1_moves, stoken);
         }
-	    optimize_solution(best_solution);
         return best_solution;
     }
 
@@ -72,11 +75,16 @@ namespace Kociemba
         return true;
     }
 
-    void KociembaSolver::search_phase1(const CubieCube &state, int depth_left, std::vector<int> &p1_moves)
+    void KociembaSolver::search_phase1(const CubieCube &state, int depth_left, std::vector<int> &p1_moves, std::stop_token stoken)
     {
 		if (!best_solution.empty() && best_solution.size() <= acceptable_length)
 		{
 			return; // already found a solution within the max length
+		}
+
+		if (stoken.stop_requested())
+		{
+			return; // stop requested
 		}
         // pruning
         int co = state.get_co_coordinate();
@@ -93,13 +101,13 @@ namespace Kociemba
         // goal reached
         if (heuristic == 0)
         {
-            int max_depth2 = max_depth - p1_moves.size();
+            int max_depth2 = max_depth - static_cast<int>(p1_moves.size());
 
             std::vector<int> p2_moves{};
             // Phase 2 IDA*
             for (int depth2 = 0; depth2 <= max_depth2; depth2++)
             {
-                search_phase2(state, depth2, p1_moves, p2_moves);
+                search_phase2(state, depth2, p1_moves, p2_moves, stoken);
             }
 
             return;
@@ -120,18 +128,22 @@ namespace Kociemba
             next_state.multiply(ALL_MOVES[move]);
             p1_moves.push_back(move);
 
-            search_phase1(next_state, depth_left - 1, p1_moves);
+            search_phase1(next_state, depth_left - 1, p1_moves, stoken);
 
             p1_moves.pop_back(); // remove last move to backtrack
         }
     }
 
-    void KociembaSolver::search_phase2(const CubieCube &state, int depth_left, std::vector<int> &p1_moves, std::vector<int> &p2_moves)
+    void KociembaSolver::search_phase2(const CubieCube &state, int depth_left, std::vector<int> &p1_moves, std::vector<int> &p2_moves, std::stop_token stoken)
     {
         if (!best_solution.empty() && best_solution.size() <= acceptable_length)
         {
             return; // already found a solution within the max length
         }
+		if (stoken.stop_requested())
+		{
+			return; // stop requested
+		}
         // pruning
         int cp = state.get_cp_coordinate();
         int ep8 = state.get_ep8_coordinate();
@@ -149,14 +161,17 @@ namespace Kociemba
         {
             if (best_solution.empty() || p1_moves.size() + p2_moves.size() < best_solution.size())
             {
+				if (p1_moves.back() / 3 == p2_moves.front() / 3)
+				{
+                    p2_moves[0] = (p2_moves[0] / 3) * 3 + ((p1_moves.back() % 3) + (p2_moves[0] % 3) + 1) % 4 - 1; // combine the two moves
+                    p1_moves.pop_back(); // remove last move of phase 1 if it's the same face as the first move of phase 2
+				}
                 std::cout << "Found new solution with " << p1_moves.size() + p2_moves.size() << " moves." << std::endl;
                 best_solution.clear();
                 best_solution.reserve(p1_moves.size() + p2_moves.size());
                 best_solution.insert(best_solution.end(), p1_moves.begin(), p1_moves.end());
                 best_solution.insert(best_solution.end(), p2_moves.begin(), p2_moves.end());
-
-                // shrink down total depth
-                // max_depth = best_solution.size() - 1;
+				// optimize_solution(best_solution);
             }
             return;
         }
@@ -176,7 +191,7 @@ namespace Kociemba
             next_state.multiply(ALL_MOVES[static_cast<int>(move)]);
             p2_moves.push_back(static_cast<int>(move));
 
-            search_phase2(next_state, depth_left - 1, p1_moves, p2_moves);
+            search_phase2(next_state, depth_left - 1, p1_moves, p2_moves, stoken);
 
             p2_moves.pop_back(); // remove last move to backtrack
         }

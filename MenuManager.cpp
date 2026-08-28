@@ -4,8 +4,8 @@ void MenuManager::updateMenuPanel() {
 	menu_panel.setTo(cv::Scalar(50, 20, 20));
 
 	cv::putText(menu_panel, "Real-time Rubik's Cube Solver", cv::Point(20, 40), cv::FONT_HERSHEY_TRIPLEX, 1.0, cv::Scalar(255, 255, 255), 2);
-    cv::putText(menu_panel, "[q] Quit", cv::Point(20, 70), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255, 255, 255), 1.5);
-    cv::putText(menu_panel, "[r] Reset", cv::Point(20, 100), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255, 255, 255), 1.5);
+    cv::putText(menu_panel, "[q] Quit", cv::Point(20, 70), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255, 255, 255), 1);
+    cv::putText(menu_panel, "[r] Reset", cv::Point(20, 100), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255, 255, 255), 1);
     if (!isCubeCaptured())
     {
         cv::putText(menu_panel, "Current step: Capture cube", cv::Point(20, 150), cv::FONT_HERSHEY_SIMPLEX, 0.6, cv::Scalar(55, 55, 255), 2);
@@ -27,7 +27,7 @@ void MenuManager::updateMenuPanel() {
 
         int start_y = 210;
         for (size_t i = 0; i < legend.size(); ++i) {
-            int y = start_y + (i * 28);
+            int y = start_y + (static_cast<int>(i) * 28);
 
             cv::rectangle(menu_panel, cv::Rect(20, y, 18, 6), legend[i].top, cv::FILLED); // top square
             cv::rectangle(menu_panel, cv::Rect(20, y + 6, 18, 18), legend[i].front, cv::FILLED); // front square
@@ -51,7 +51,7 @@ void MenuManager::updateMenuPanel() {
 					std::lock_guard<std::mutex> lock(solution_mutex);
 					std::string solution_str = moves_to_string(solution);
 					cv::putText(menu_panel, "Current step: Solution found (" + std::to_string(solution.size()) + " moves). Perform moves below.", cv::Point(20, 150), cv::FONT_HERSHEY_SIMPLEX, 0.55, cv::Scalar(0, 255, 0), 2);
-                    cv::putText(menu_panel, solution_str, cv::Point(20, 180), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 255, 0), 1.5);
+                    cv::putText(menu_panel, solution_str, cv::Point(20, 180), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 255, 0), 1);
 
                     cv::putText(menu_panel, "Hold the cube in this position:", cv::Point(20, 220), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255, 255, 255), 1);
 
@@ -115,27 +115,36 @@ bool MenuManager::update(cv::Mat& frame) {
 
     visualizer.display_cube(cubeVision.getCurrentFaceletCube());
     cv::Mat visualizer_output = visualizer.get_mat();
-    cv::Mat left_image;
+    cv::Mat top_image;
     cv::putText(visualizer_output, "Visualizer", cv::Point(20, 40), cv::FONT_HERSHEY_TRIPLEX, 0.8, cv::Scalar(255, 255, 255), 2);
-    cv::vconcat(menu_panel, visualizer_output, left_image);
+    cv::hconcat(menu_panel, visualizer_output, top_image);
 
-    cv::Mat right_image;
+    cv::Mat bottom_image;
 	cv::putText(frame, "Camera", cv::Point(20, 40), cv::FONT_HERSHEY_TRIPLEX, 0.8, cv::Scalar(0, 0, 0), 2);
-    cv::putText(output, "Output Masks", cv::Point(20, 40), cv::FONT_HERSHEY_TRIPLEX, 0.8, cv::Scalar(255, 255, 255), 2);
-    cv::vconcat(frame, output, right_image);
+    cv::putText(output, "Output Mask", cv::Point(20, 40), cv::FONT_HERSHEY_TRIPLEX, 0.8, cv::Scalar(255, 255, 255), 2);
+    cv::hconcat(frame, output, bottom_image);
 
 	cv::Mat combined_output;
-	cv::hconcat(left_image, right_image, combined_output);
+	cv::vconcat(top_image, bottom_image, combined_output);
     cv::imshow("Cube Solver", combined_output);
 
 	int key = cv::waitKey(1);
     if (key == 'q')
     {
+        if (solver_thread.joinable()) {
+            solver_thread.request_stop();
+            solver_thread.join();
+        }
 		return false; // Exit the loop if 'q' is pressed
     } 
     else if (key == 'r')
 	{
 		std::cout << "Resetting cube state..." << std::endl;
+        if (solver_thread.joinable()) {
+            solver_thread.request_stop();
+            solver_thread.join();
+        }
+        std::cout << "Cube state reset." << std::endl;
 		cubeVision.reset();
 		solution.clear();
 	}
@@ -145,16 +154,19 @@ bool MenuManager::update(cv::Mat& frame) {
             // TODO: move to a separate thread to avoid blocking the main loop
             std::cout << "Getting solve..." << std::endl;
             if (solver_thread.joinable()) {
+                solver_thread.request_stop();
                 solver_thread.join();
             }
-            solver_thread = std::thread(&MenuManager::solveCube, this);
+            solver_thread = std::jthread([this](std::stop_token stoken) {
+                this->solveCube(stoken);
+            });
         }
 	}
 
     return true;
 }
 
-void MenuManager::solveCube() {
+void MenuManager::solveCube(std::stop_token stoken) {
     std::lock_guard<std::mutex> lock(solution_mutex);
     currently_solving = true;
     std::cout << "Current facelet state: ";
@@ -164,7 +176,7 @@ void MenuManager::solveCube() {
         std::cout << tempCube.to_facelet_cube()[i] << " ";
     }
     std::cout << std::endl;
-    solution = solver.solve(tempCube);
+    solution = solver.solve(tempCube, stoken);
     currently_solving = false;
     std::cout << "Solved: " << moves_to_string(solution) << " (" << solution.size() << " moves)" << std::endl;
 }

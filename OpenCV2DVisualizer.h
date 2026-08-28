@@ -8,7 +8,7 @@ class OpenCV2DVisualizer :
     public Visualizer
 {
 public:
-	OpenCV2DVisualizer() : mat(cv::Mat::zeros(480, 640, CV_8UC3)) {
+	OpenCV2DVisualizer() : mat(cv::Mat::zeros(400, 640, CV_8UC3)) {
 		this->display_colors = std::array<CubeVision::BgrColor, COLOR_COUNT + 1>{
 				CubeVision::BgrColor{255, 255, 255}, // U_COLOR (white)
 				CubeVision::BgrColor{0, 0, 255},     // R_COLOR (red)

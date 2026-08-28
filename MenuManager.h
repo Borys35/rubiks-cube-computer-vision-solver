@@ -12,7 +12,7 @@ class MenuManager
 public:
 	MenuManager(CubeVision& cube_vision, OpenCV2DVisualizer& visualizer, CubieCube& current_cube, ISolver& solver) : 
 		cubeVision(cube_vision), visualizer(visualizer), currentCube(current_cube), solver(solver) {
-		menu_panel = cv::Mat::zeros(480, 640, CV_8UC3);
+		menu_panel = cv::Mat::zeros(400, 640, CV_8UC3);
 	}
 
 	~MenuManager() {
@@ -31,11 +31,11 @@ private:
 	void updateMenuPanel();
 	bool isCubeCaptured() const;
 	bool isCubeSolvable() const;
-	void solveCube();
+	void solveCube(std::stop_token stoken);
 
 	cv::Mat menu_panel;
 	std::atomic<bool> currently_solving = false;
-	std::thread solver_thread;
+	std::jthread solver_thread;
 	std::vector<int> solution = {};
 	std::mutex solution_mutex;
 };

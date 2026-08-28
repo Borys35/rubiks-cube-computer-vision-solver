@@ -15,8 +15,8 @@ namespace Kociemba
         std::vector<int> best_solution;
 
         bool is_cube_in_g1_substate(const CubieCube &cc);
-        void search_phase1(const CubieCube &state, int depth_left, std::vector<int> &p1_moves);
-        void search_phase2(const CubieCube &state, int depth_left, std::vector<int> &p1_moves, std::vector<int> &p2_moves);
+        void search_phase1(const CubieCube &state, int depth_left, std::vector<int> &p1_moves, std::stop_token stoken);
+        void search_phase2(const CubieCube &state, int depth_left, std::vector<int> &p1_moves, std::vector<int> &p2_moves, std::stop_token stoken);
 
     public:
         KociembaSolver(int max_depth_total, int acceptable_length) : max_depth_total(max_depth_total), acceptable_length(acceptable_length)
@@ -24,6 +24,6 @@ namespace Kociemba
         }
 
 		void optimize_solution(std::vector<int>& solution);
-        std::vector<int> solve(const CubieCube &cc) override;
+        std::vector<int> solve(const CubieCube &cc, std::stop_token stoken) override;
     };
 }

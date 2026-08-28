@@ -2,7 +2,7 @@
 
 void OpenCV2DVisualizer::display_cube(const FaceletCube& fc) const {
     cv::Mat& canvas = const_cast<cv::Mat&>(this->mat);
-    canvas.setTo(cv::Scalar(0, 0, 0));
+    canvas.setTo(cv::Scalar(10, 30, 10));
 
     int facelet_size = 40;
     int start_x = (canvas.cols - 12 * facelet_size) / 2;

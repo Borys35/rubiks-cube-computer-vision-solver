@@ -2,13 +2,13 @@
 
 #include "include/bfs_solver.hpp"
 
-std::vector<int> BFSSolver::solve(const CubieCube &cc)
+std::vector<int> BFSSolver::solve(const CubieCube &cc, std::stop_token stoken)
 {
     // {Current Cube State, Moves History}
     std::queue<std::pair<CubieCube, std::vector<int>>> q;
     q.push({cc, {}});
 
-    while (!q.empty())
+    while (!q.empty() && !stoken.stop_requested())
     {
         std::pair<CubieCube, std::vector<int>> current_state = q.front();
         CubieCube current_cube = current_state.first;

@@ -10,5 +10,5 @@ private:
 public:
     BFSSolver(int max_depth) : max_depth(max_depth) {}
 
-    std::vector<int> solve(const CubieCube &cc) override;
+    std::vector<int> solve(const CubieCube &cc, std::stop_token stoken) override;
 };
