@@ -431,3 +431,5 @@ FodyWeavers.xsd
 # Custom ignores
 x64/
 .vscode/
+
+docs/

@@ -159,19 +159,15 @@ namespace Kociemba
         // goal reached
         if (heuristic == 0)
         {
-            if (best_solution.empty() || p1_moves.size() + p2_moves.size() < best_solution.size())
+			std::vector<int> full_solution = p1_moves;
+            full_solution.insert(full_solution.end(), p2_moves.begin(), p2_moves.end());
+			optimize_solution(full_solution);
+            if (best_solution.empty() || full_solution.size() < best_solution.size())
             {
-				if (p1_moves.back() / 3 == p2_moves.front() / 3)
-				{
-                    p2_moves[0] = (p2_moves[0] / 3) * 3 + ((p1_moves.back() % 3) + (p2_moves[0] % 3) + 1) % 4 - 1; // combine the two moves
-                    p1_moves.pop_back(); // remove last move of phase 1 if it's the same face as the first move of phase 2
-				}
-                std::cout << "Found new solution with " << p1_moves.size() + p2_moves.size() << " moves." << std::endl;
                 best_solution.clear();
-                best_solution.reserve(p1_moves.size() + p2_moves.size());
-                best_solution.insert(best_solution.end(), p1_moves.begin(), p1_moves.end());
-                best_solution.insert(best_solution.end(), p2_moves.begin(), p2_moves.end());
-				// optimize_solution(best_solution);
+                best_solution.reserve(full_solution.size());
+                best_solution.insert(best_solution.end(), full_solution.begin(), full_solution.end());
+                std::cout << "Found new solution with " << best_solution.size() << " moves." << std::endl;
             }
             return;
         }

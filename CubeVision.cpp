@@ -144,8 +144,8 @@ std::optional<cv::Rect> CubeVision::extractCubeFaceRect(const cv::Mat& combined_
 float CubeVision::iou(const cv::Rect& rect1, const cv::Rect& rect2) {
 	int ix = std::ranges::max(rect1.x, rect2.x);
 	int iy = std::ranges::max(rect1.y, rect2.y);
-	int ix2 = std::ranges::max(rect1.x + rect1.width, rect2.x + rect2.width);
-	int iy2 = std::ranges::max(rect1.y + rect1.height, rect2.y + rect2.height);
+	int ix2 = std::ranges::min(rect1.x + rect1.width, rect2.x + rect2.width);
+	int iy2 = std::ranges::min(rect1.y + rect1.height, rect2.y + rect2.height);
 	int iw = std::ranges::max(0, ix2 - ix);
 	int ih = std::ranges::max(0, iy2 - iy);
 	int inter = iw * ih;

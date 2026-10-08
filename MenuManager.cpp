@@ -150,7 +150,7 @@ bool MenuManager::update(cv::Mat& frame) {
 	}
     else if (key == 's')
     {
-        if (!currently_solving) {
+        if (!currently_solving && isCubeCaptured() && isCubeSolvable()) {
             // TODO: move to a separate thread to avoid blocking the main loop
             std::cout << "Getting solve..." << std::endl;
             if (solver_thread.joinable()) {
