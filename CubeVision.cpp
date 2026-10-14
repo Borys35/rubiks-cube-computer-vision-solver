@@ -22,7 +22,8 @@ cv::Mat CubeVision::normalizeYuv(const cv::Mat& bgr_frame)
 			}
 			else if (Y < 128)
 			{
-				kappa = 128.0f / (256.0f - Y);
+				// kappa = 128.0f / (256.0f - Y);
+				kappa = (256.0f - Y) / 128.0f;
 			}
 			uchar U_prime = cv::saturate_cast<uchar>(std::round((U - 128.0f) * kappa + 128.0f));
 			uchar V_prime = cv::saturate_cast<uchar>(std::round((V - 128.0f) * kappa + 128.0f));

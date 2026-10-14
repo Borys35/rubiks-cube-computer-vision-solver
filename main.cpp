@@ -35,10 +35,10 @@ int main()
 	};*/
     CubeVision::ColorRange color_ranges[COLOR_COUNT] = {
         {{148, 255}, {135, 156}, {31, 255}},  // U_COLOR (white)
-        {{78, 122}, {0, 255}, {167, 255}},    // R_COLOR (red)
+        {{78, 140}, {0, 255}, {167, 255}},    // R_COLOR (red)
         {{13, 255}, {120, 177}, {10, 86}},    // F_COLOR (green)
         {{0, 255}, {0, 112}, {107, 133}},     // D_COLOR (yellow)
-        {{150, 210}, {52, 148}, {160, 250}},  // L_COLOR (orange)
+        {{140, 210}, {52, 148}, {160, 250}},  // L_COLOR (orange)
         {{0, 117}, {140, 250}, {0, 110}}      // B_COLOR (blue)
     };
 	CubeVision::BgrColor display_colors[COLOR_COUNT] = {
