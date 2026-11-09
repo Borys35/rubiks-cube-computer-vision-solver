@@ -168,7 +168,7 @@ bool CubeVision::registerRect(const std::optional<cv::Rect>& rect) {
 		prev_rect = rect.value();
 
 		if (stable_frames >= cfg.stable_frame_count) {
-			std::cout << "Stable cube face detected" << std::endl;
+			/* std::cout << "Stable cube face detected" << std::endl; */
 			stable_frames = 0;
 			return true;
 		}
@@ -203,6 +203,10 @@ void CubeVision::readFaceState(const cv::Rect& rect, const std::array<cv::Mat, C
 			}
 			facelet_face[i * 3 + j] = max_color;
 		}
+	}
+
+	if (facelet_face[4] == UNKNOWN_COLOR) {
+		return; // center cell is unknown, do not update
 	}
 
 	int start_cell_idx = facelet_face[4] * 9;

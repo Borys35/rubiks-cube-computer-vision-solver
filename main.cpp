@@ -12,35 +12,63 @@
 #include <opencv2/opencv.hpp>
 #include <vector>
 #include <algorithm>
+#include <chrono>
+
+#define NOMINMAX
+#include <windows.h>
+#include <psapi.h>
+
+PROCESS_MEMORY_COUNTERS_EX readMemory()
+{
+    PROCESS_MEMORY_COUNTERS_EX pmc{};
+    pmc.cb = sizeof(pmc);
+    GetProcessMemoryInfo(GetCurrentProcess(),
+        reinterpret_cast<PROCESS_MEMORY_COUNTERS*>(&pmc),
+        sizeof(pmc));
+    return pmc;
+}
+
+using namespace std::chrono;
 
 int main()
 {
-    MoveTables::init_move_tables();
-    Kociemba::PruningTables::init_all_pruning_tables();
+    auto before = readMemory();
 
-    cv::VideoCapture cap(0);
+    auto begin = steady_clock::now();
+    MoveTables::init_move_tables();
+    auto end = steady_clock::now();
+    auto duration = duration_cast<microseconds>(end - begin).count();
+    std::cout << "Move Tables initialization time: " << duration << " µs" << std::endl;
+
+    begin = steady_clock::now();
+    Kociemba::PruningTables::init_all_pruning_tables();
+    end = steady_clock::now();
+    duration = duration_cast<microseconds>(end - begin).count();
+    std::cout << "Pruning Tables initialization time: " << duration << " µs" << std::endl;
+
+    auto after = readMemory();
+    std::cout << "Memory usage: " << before.WorkingSetSize << ',' << after.WorkingSetSize << ','
+        << after.PeakWorkingSetSize << ',' << after.PrivateUsage << '\n';
+
+    //cv::VideoCapture cap(0);
+    cv::VideoCapture cap(0, cv::CAP_DSHOW);
+    //cap.set(cv::CAP_PROP_AUTO_WB, 0);
+    cap.set(cv::CAP_PROP_SETTINGS, 1);
     if (!cap.isOpened())
     {
         std::cerr << "Error: Could not open the camera." << std::endl;
         return -1;
     }
 
-	/*CubeVision::ColorRange color_ranges[COLOR_COUNT] = {
-		{{148, 255}, {135, 156}, {31, 255}},  // U_COLOR (white)
-		{{104, 143}, {0, 255}, {167, 255}},   // R_COLOR (red)
-		{{13, 255}, {120, 177}, {10, 86}},    // F_COLOR (green)
-		{{0, 255}, {0, 112}, {107, 133}},     // D_COLOR (yellow)
-        {{167, 203}, {52, 148}, {160, 250}},  // L_COLOR (orange)
-		{{0, 117}, {140, 250}, {0, 110}}      // B_COLOR (blue)
-	};*/
     CubeVision::ColorRange color_ranges[COLOR_COUNT] = {
-        {{148, 255}, {135, 156}, {31, 255}},  // U_COLOR (white)
-        {{78, 140}, {0, 255}, {167, 255}},    // R_COLOR (red)
-        {{13, 255}, {120, 177}, {10, 86}},    // F_COLOR (green)
+        {{148, 255}, {130, 156}, {31, 255}},  // U_COLOR (white)
+        {{78, 122}, {0, 255}, {167, 255}},    // R_COLOR (red)
+        {{13, 255}, {91, 148}, {10, 86}},    // F_COLOR (green)
         {{0, 255}, {0, 112}, {107, 133}},     // D_COLOR (yellow)
         {{140, 210}, {52, 148}, {160, 250}},  // L_COLOR (orange)
         {{0, 117}, {140, 250}, {0, 110}}      // B_COLOR (blue)
     };
+
 	CubeVision::BgrColor display_colors[COLOR_COUNT] = {
 		{255, 255, 255}, // U_COLOR (white)
 		{0, 0, 255},     // R_COLOR (red)
@@ -66,11 +94,12 @@ int main()
 	CubeVision cubeVision(my_cfg);
     OpenCV2DVisualizer visualizer = OpenCV2DVisualizer();
 	CubieCube currentCube = CubieCube();
-	Kociemba::KociembaSolver solver = Kociemba::KociembaSolver(25u, 22u);
+	Kociemba::KociembaSolver solver = Kociemba::KociembaSolver(26u, 24u);
 	MenuManager menuManager(cubeVision, visualizer, currentCube, solver);
 
     while (true)
     {
+        begin = steady_clock::now();
         cv::Mat frame;
         cap >> frame;
 
@@ -84,51 +113,10 @@ int main()
 		{
             break;
 		}
-        
+		end = steady_clock::now();
+        duration = duration_cast<microseconds>(end - begin).count();
+        std::cout << "While look step time: " << duration << " µs" << std::endl;
     }
 
     return 0;
 }
-
-/*
-// 0 0 0 0 0 0 0 0 0 4 4 4 1 1 1 1 1 1 5 5 5 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 1 1 1 4 4 4 4 4 4 2 2 2 5 5 5 5 5 5 <- U2 from cv
-// 0 0 0 0 0 0 0 0 0 4 4 4 1 1 1 1 1 1 5 5 5 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 1 1 1 4 4 4 4 4 4 2 2 2 5 5 5 5 5 5
-int main()
-{
-    MoveTables::init_move_tables();
-    Kociemba::PruningTables::init_all_pruning_tables();
-
-    CubieCube cc = CubieCube();
-
-    std::string scramble_string = "U2 R";
-    std::cout << "Scramble: " << scramble_string << std::endl;
-
-    std::vector<int> scramble_moves = string_to_moves(scramble_string);
-    for (size_t i = 0; i < scramble_moves.size(); i++)
-    {
-        cc.multiply(ALL_MOVES[scramble_moves[i]]);
-    }
-
-	cc.from_facelet_cube(cc.to_facelet_cube()); // Ensure the cube is in a valid state after scrambling
-	std::cout << "Scrambled cube state: ";
-	for (size_t i = 0; i < 54; i++)
-	{
-		std::cout << cc.to_facelet_cube()[i] << " ";
-	}
-    Visualizer *visualizer = new TerminalVisualizer();
-    visualizer->display_cube(cc.to_facelet_cube());
-
-    // ISolver *solver = new BFSSolver(max_depth_total);
-    auto max_depth_total{20u};
-    auto acceptable_length{20u};
-    ISolver *solver = new Kociemba::KociembaSolver(max_depth_total, acceptable_length);
-    std::vector<int> solve_moves = solver->solve(cc);
-
-    // Solve: R' U2 R' L
-    std::cout << "Solve: " << moves_to_string(solve_moves) << " (" << solve_moves.size() << " moves)" << std::endl;
-
-    delete visualizer;
-    delete solver;
-
-    return 0;
-}*/

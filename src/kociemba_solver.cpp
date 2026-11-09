@@ -8,6 +8,8 @@ namespace Kociemba
 
     std::vector<int> KociembaSolver::solve(const CubieCube &cc, std::stop_token stoken)
     {
+		auto begin = std::chrono::steady_clock::now();
+
         best_solution.clear();
         max_depth = max_depth_total;
         std::vector<int> p1_moves{};
@@ -22,9 +24,13 @@ namespace Kociemba
             {
                 break; // stop requested
             }
-            std::cout << "Searching phase 1 with depth " << depth1 << std::endl;
+            // std::cout << "Searching phase 1 with depth " << depth1 << std::endl;
             search_phase1(cc, depth1, p1_moves, stoken);
         }
+
+		auto end = std::chrono::steady_clock::now();
+		auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+		std::cout << "Kociemba solver time: " << duration << " µs" << std::endl;
         return best_solution;
     }
 
@@ -46,7 +52,7 @@ namespace Kociemba
             }
         }
 
-		std::cout << "Optimized solution length: " << write_idx << std::endl;
+		/* std::cout << "Optimized solution length: " << write_idx << std::endl; */
         solution.resize(write_idx);
 	}
 
@@ -167,7 +173,7 @@ namespace Kociemba
                 best_solution.clear();
                 best_solution.reserve(full_solution.size());
                 best_solution.insert(best_solution.end(), full_solution.begin(), full_solution.end());
-                std::cout << "Found new solution with " << best_solution.size() << " moves." << std::endl;
+				/* std::cout << "Found new solution with " << best_solution.size() << " moves." << std::endl; */
             }
             return;
         }

@@ -90,6 +90,7 @@ bool MenuManager::isCubeSolvable() const {
 }
 
 bool MenuManager::update(cv::Mat& frame) {
+	auto begin = std::chrono::steady_clock::now();
     cv::Mat yuv = cubeVision.normalizeYuv(frame);
     cv::Mat combined_mask = cv::Mat::zeros(yuv.size(), CV_8UC1);
     std::array<cv::Mat, COLOR_COUNT> masks = cubeVision.detectCellColors(yuv, combined_mask);
@@ -162,6 +163,10 @@ bool MenuManager::update(cv::Mat& frame) {
             });
         }
 	}
+
+    auto end = std::chrono::steady_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+    std::cout << "Menu update time: " << duration << " µs" << std::endl;
 
     return true;
 }
